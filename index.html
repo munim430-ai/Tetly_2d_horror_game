@@ -154,10 +154,12 @@ const PLAYER_W = 20, PLAYER_H = 40;
 const ENTITY_W = 20, ENTITY_H = 60;
 
 // ==================== GAME STATE ====================
-let state = 'start'; // start, playing, dead, win
+let state = 'start'; // start, playing, dead, win, levelComplete
 let frameCount = 0;
 let heartbeatTimer = 0;
 let entityProximityTimer = 0;
+let currentLevel = 0;
+let levelData = {};
 
 const keys = {
   left: false, right: false, f: false, h: false,
@@ -172,6 +174,9 @@ window.addEventListener('keydown', e => {
   if ((e.key === 'h' || e.key === 'H') && !keys.h) { keys.h = true; keys.hPressed = true; }
   if ((e.key === ' ' || e.key === 'Enter') && (state === 'start' || state === 'dead' || state === 'win')) {
     startGame();
+  }
+  if ((e.key === ' ' || e.key === 'Enter') && state === 'levelComplete') {
+    advanceLevel();
   }
 });
 window.addEventListener('keyup', e => {
@@ -215,6 +220,7 @@ const JOY_CX = 80, JOY_CY = BASE_H - 80, JOY_R = 60;
 canvas.addEventListener('touchstart', e => {
   e.preventDefault();
   if (state === 'start' || state === 'dead' || state === 'win') { startGame(); return; }
+  if (state === 'levelComplete') { advanceLevel(); return; }
   initAudio();
   for (let i = 0; i < e.changedTouches.length; i++) {
     const t = e.changedTouches[i];
@@ -260,53 +266,244 @@ canvas.addEventListener('touchend', e => {
 
 canvas.addEventListener('click', e => {
   if (state === 'start' || state === 'dead' || state === 'win') startGame();
+  if (state === 'levelComplete') advanceLevel();
   initAudio();
 });
 
-// ==================== LEVEL DEFINITION ====================
-const obstacles = [
-  { x: 240, y: GROUND_Y - 30, w: 60, h: 30, type: 'bed' },
-  { x: 390, y: 300, w: 20, h: GROUND_Y - 300, type: 'wall' },
-  { x: 640, y: 360, w: 30, h: GROUND_Y - 360, type: 'wallchunk' },
-  { x: 990, y: 300, w: 15, h: GROUND_Y - 300, type: 'bars' },
-  { x: 1390, y: 350, w: 80, h: GROUND_Y - 350, type: 'debris' },
-  { x: 1790, y: 310, w: 40, h: GROUND_Y - 310, type: 'wall' },
-  { x: 2390, y: GROUND_Y - 35, w: 80, h: 35, type: 'table' },
-  { x: 450, y: GROUND_Y - 25, w: 30, h: 25, type: 'wheelchair' },
-  { x: 1100, y: GROUND_Y - 25, w: 30, h: 25, type: 'wheelchair' },
-  { x: 2600, y: GROUND_Y - 28, w: 35, h: 28, type: 'wheelchair' },
+// ==================== LEVELS ====================
+const LEVELS = [
+  // Level 1: The Morgue
+  {
+    name: 'The Morgue',
+    description: 'The cold storage. Something still walks these halls.',
+    bgColor: '#0a0a0f',
+    floorColor: '#1a1a22',
+    entityStart: 2000,
+    entityPatrolLeft: 1800,
+    entityPatrolRight: 2400,
+    speedPatrol: 1.5,
+    speedHunt: 3.0,
+    speedFinal: 4.0,
+    batteryDrainRate: 0.08,
+    obstacles: [
+      { x: 240, y: GROUND_Y - 30, w: 60, h: 30, type: 'bed' },
+      { x: 390, y: 300, w: 20, h: GROUND_Y - 300, type: 'wall' },
+      { x: 640, y: 360, w: 30, h: GROUND_Y - 360, type: 'wallchunk' },
+      { x: 990, y: 300, w: 15, h: GROUND_Y - 300, type: 'bars' },
+      { x: 1390, y: 350, w: 80, h: GROUND_Y - 350, type: 'debris' },
+      { x: 1790, y: 310, w: 40, h: GROUND_Y - 310, type: 'wall' },
+      { x: 2390, y: GROUND_Y - 35, w: 80, h: 35, type: 'table' },
+      { x: 450, y: GROUND_Y - 25, w: 30, h: 25, type: 'wheelchair' },
+      { x: 1100, y: GROUND_Y - 25, w: 30, h: 25, type: 'wheelchair' },
+      { x: 2600, y: GROUND_Y - 28, w: 35, h: 28, type: 'wheelchair' },
+    ],
+    lockers: [
+      { x: 300, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 900, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 1500, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 2500, y: GROUND_Y - 60, w: 30, h: 60 },
+    ],
+    batteries: [
+      { x: 700 }, { x: 1300 }, { x: 2000 }, { x: 2700 }
+    ],
+    keyItems: [
+      { x: 500 }, { x: 1200 }, { x: 2200 }
+    ],
+    exitDoor: { x: 3100, y: GROUND_Y - 70, w: 30, h: 70 },
+    bloodSmears: [350, 800, 1450, 2100, 2800],
+  },
+  // Level 2: The Basement
+  {
+    name: 'The Basement',
+    description: 'Steam pipes hiss in the darkness. The boiler room hides the second set of keys.',
+    bgColor: '#050a05',
+    floorColor: '#121a12',
+    entityStart: 1800,
+    entityPatrolLeft: 1400,
+    entityPatrolRight: 2200,
+    speedPatrol: 1.8,
+    speedHunt: 3.2,
+    speedFinal: 4.5,
+    batteryDrainRate: 0.09,
+    obstacles: [
+      { x: 180, y: GROUND_Y - 40, w: 50, h: 40, type: 'bed' },
+      { x: 380, y: 280, w: 20, h: GROUND_Y - 280, type: 'wall' },
+      { x: 620, y: GROUND_Y - 35, w: 70, h: 35, type: 'table' },
+      { x: 850, y: 320, w: 15, h: GROUND_Y - 320, type: 'bars' },
+      { x: 1100, y: 340, w: 30, h: GROUND_Y - 340, type: 'wallchunk' },
+      { x: 1350, y: 300, w: 20, h: GROUND_Y - 300, type: 'wall' },
+      { x: 1600, y: 360, w: 80, h: GROUND_Y - 360, type: 'debris' },
+      { x: 1900, y: GROUND_Y - 30, w: 40, h: 30, type: 'wheelchair' },
+      { x: 2300, y: 310, w: 20, h: GROUND_Y - 310, type: 'wall' },
+      { x: 2700, y: GROUND_Y - 38, w: 60, h: 38, type: 'table' },
+    ],
+    lockers: [
+      { x: 250, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 800, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 1450, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 2400, y: GROUND_Y - 60, w: 30, h: 60 },
+    ],
+    batteries: [
+      { x: 600 }, { x: 1200 }, { x: 1850 }, { x: 2600 }
+    ],
+    keyItems: [
+      { x: 450 }, { x: 1050 }, { x: 2100 }
+    ],
+    exitDoor: { x: 3080, y: GROUND_Y - 70, w: 30, h: 70 },
+    bloodSmears: [320, 750, 1200, 1900, 2500],
+  },
+  // Level 3: Patient Corridors
+  {
+    name: 'Patient Corridors',
+    description: 'The patient wing. Dozens of locked cells line the corridor.',
+    bgColor: '#0a080f',
+    floorColor: '#18161e',
+    entityStart: 1600,
+    entityPatrolLeft: 900,
+    entityPatrolRight: 2200,
+    speedPatrol: 2.0,
+    speedHunt: 3.5,
+    speedFinal: 5.0,
+    batteryDrainRate: 0.09,
+    obstacles: [
+      { x: 200, y: 300, w: 20, h: GROUND_Y - 300, type: 'wall' },
+      { x: 300, y: GROUND_Y - 30, w: 40, h: 30, type: 'wheelchair' },
+      { x: 550, y: 320, w: 15, h: GROUND_Y - 320, type: 'bars' },
+      { x: 750, y: 310, w: 15, h: GROUND_Y - 310, type: 'bars' },
+      { x: 950, y: GROUND_Y - 35, w: 60, h: 35, type: 'table' },
+      { x: 1200, y: 290, w: 20, h: GROUND_Y - 290, type: 'wall' },
+      { x: 1500, y: 340, w: 15, h: GROUND_Y - 340, type: 'bars' },
+      { x: 1700, y: 350, w: 70, h: GROUND_Y - 350, type: 'debris' },
+      { x: 2100, y: 300, w: 20, h: GROUND_Y - 300, type: 'wall' },
+      { x: 2500, y: GROUND_Y - 30, w: 45, h: 30, type: 'bed' },
+      { x: 2800, y: 320, w: 15, h: GROUND_Y - 320, type: 'bars' },
+    ],
+    lockers: [
+      { x: 150, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 700, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 1350, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 2350, y: GROUND_Y - 60, w: 30, h: 60 },
+    ],
+    batteries: [
+      { x: 480 }, { x: 1080 }, { x: 1800 }, { x: 2700 }
+    ],
+    keyItems: [
+      { x: 420 }, { x: 1100 }, { x: 2250 }
+    ],
+    exitDoor: { x: 3050, y: GROUND_Y - 70, w: 30, h: 70 },
+    bloodSmears: [280, 680, 1300, 2000, 2700],
+  },
+  // Level 4: Operating Theatre
+  {
+    name: 'Operating Theatre',
+    description: 'The smell of antiseptic barely masks the blood. Something moved the scalpels.',
+    bgColor: '#080808',
+    floorColor: '#141414',
+    entityStart: 1500,
+    entityPatrolLeft: 700,
+    entityPatrolRight: 2500,
+    speedPatrol: 2.2,
+    speedHunt: 3.8,
+    speedFinal: 5.5,
+    batteryDrainRate: 0.10,
+    obstacles: [
+      { x: 220, y: GROUND_Y - 45, w: 90, h: 45, type: 'table' },
+      { x: 500, y: 330, w: 20, h: GROUND_Y - 330, type: 'wall' },
+      { x: 700, y: GROUND_Y - 30, w: 50, h: 30, type: 'wheelchair' },
+      { x: 900, y: GROUND_Y - 45, w: 90, h: 45, type: 'table' },
+      { x: 1150, y: 320, w: 20, h: GROUND_Y - 320, type: 'wall' },
+      { x: 1400, y: GROUND_Y - 45, w: 90, h: 45, type: 'table' },
+      { x: 1700, y: 350, w: 20, h: GROUND_Y - 350, type: 'wallchunk' },
+      { x: 2000, y: GROUND_Y - 45, w: 80, h: 45, type: 'table' },
+      { x: 2300, y: 310, w: 20, h: GROUND_Y - 310, type: 'wall' },
+      { x: 2600, y: GROUND_Y - 45, w: 90, h: 45, type: 'table' },
+    ],
+    lockers: [
+      { x: 120, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 650, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 1300, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 2400, y: GROUND_Y - 60, w: 30, h: 60 },
+    ],
+    batteries: [
+      { x: 400 }, { x: 950 }, { x: 1650 }, { x: 2500 }
+    ],
+    keyItems: [
+      { x: 350 }, { x: 1000 }, { x: 2150 }
+    ],
+    exitDoor: { x: 3020, y: GROUND_Y - 70, w: 30, h: 70 },
+    bloodSmears: [400, 800, 1500, 2200, 2800],
+  },
+  // Level 5: The Rooftop
+  {
+    name: 'The Rooftop',
+    description: 'The roof access. Signal fires burn in the distance. One last sprint.',
+    bgColor: '#05050f',
+    floorColor: '#0f0f1a',
+    entityStart: 2500,
+    entityPatrolLeft: 1500,
+    entityPatrolRight: 3000,
+    speedPatrol: 2.5,
+    speedHunt: 4.5,
+    speedFinal: 6.0,
+    batteryDrainRate: 0.10,
+    obstacles: [
+      { x: 280, y: 360, w: 60, h: GROUND_Y - 360, type: 'debris' },
+      { x: 550, y: GROUND_Y - 30, w: 40, h: 30, type: 'wheelchair' },
+      { x: 750, y: 330, w: 20, h: GROUND_Y - 330, type: 'wall' },
+      { x: 1000, y: GROUND_Y - 40, w: 70, h: 40, type: 'table' },
+      { x: 1300, y: 340, w: 15, h: GROUND_Y - 340, type: 'bars' },
+      { x: 1600, y: 360, w: 80, h: GROUND_Y - 360, type: 'debris' },
+      { x: 1900, y: 320, w: 20, h: GROUND_Y - 320, type: 'wall' },
+      { x: 2200, y: GROUND_Y - 30, w: 50, h: 30, type: 'wheelchair' },
+      { x: 2600, y: 340, w: 15, h: GROUND_Y - 340, type: 'bars' },
+      { x: 2850, y: GROUND_Y - 40, w: 70, h: 40, type: 'table' },
+    ],
+    lockers: [
+      { x: 200, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 750, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 1450, y: GROUND_Y - 60, w: 30, h: 60 },
+      { x: 2300, y: GROUND_Y - 60, w: 30, h: 60 },
+    ],
+    batteries: [
+      { x: 500 }, { x: 1100 }, { x: 1800 }, { x: 2650 }
+    ],
+    keyItems: [
+      { x: 400 }, { x: 1200 }, { x: 2100 }
+    ],
+    exitDoor: { x: 3000, y: GROUND_Y - 80, w: 40, h: 80 },
+    bloodSmears: [350, 900, 1400, 2000, 2700],
+  },
 ];
 
-const lockers = [
-  { x: 300, y: GROUND_Y - 60, w: 30, h: 60, cooldown: 0 },
-  { x: 900, y: GROUND_Y - 60, w: 30, h: 60, cooldown: 0 },
-  { x: 1500, y: GROUND_Y - 60, w: 30, h: 60, cooldown: 0 },
-  { x: 2500, y: GROUND_Y - 60, w: 30, h: 60, cooldown: 0 },
-];
+// ==================== LEVEL DEFINITION (runtime arrays, populated by loadLevel) ====================
+let obstacles = [];
+let lockers = [];
+let batteries = [];
+let keyItems = [];
+let exitDoor = {};
+let bloodSmears = [];
 
-const batteries = [
-  { x: 700, y: GROUND_Y - 20, collected: false },
-  { x: 1300, y: GROUND_Y - 20, collected: false },
-  { x: 2000, y: GROUND_Y - 20, collected: false },
-  { x: 2700, y: GROUND_Y - 20, collected: false },
-];
+function loadLevel(index) {
+  currentLevel = index;
+  levelData = LEVELS[index];
 
-const keyItems = [
-  { x: 500, y: GROUND_Y - 25, collected: false },
-  { x: 1200, y: GROUND_Y - 25, collected: false },
-  { x: 2200, y: GROUND_Y - 25, collected: false },
-];
+  obstacles.length = 0;
+  levelData.obstacles.forEach(o => obstacles.push(o));
 
-const exitDoor = { x: 3100, y: GROUND_Y - 70, w: 30, h: 70 };
+  lockers.length = 0;
+  levelData.lockers.forEach(l => lockers.push({ ...l, cooldown: 0 }));
 
-// Blood smears positions
-const bloodSmears = [
-  { x: 350, y: GROUND_Y - 80, w: 60, type: 0 },
-  { x: 800, y: GROUND_Y - 100, w: 80, type: 1 },
-  { x: 1450, y: GROUND_Y - 60, w: 50, type: 0 },
-  { x: 2100, y: GROUND_Y - 90, w: 70, type: 1 },
-  { x: 2800, y: GROUND_Y - 70, w: 55, type: 0 },
-];
+  batteries.length = 0;
+  levelData.batteries.forEach(b => batteries.push({ x: b.x, y: GROUND_Y - 20, collected: false }));
+
+  keyItems.length = 0;
+  levelData.keyItems.forEach(k => keyItems.push({ x: k.x, y: GROUND_Y - 25, collected: false }));
+
+  Object.assign(exitDoor, levelData.exitDoor);
+
+  bloodSmears.length = 0;
+  levelData.bloodSmears.forEach((s, i) => bloodSmears.push({ x: s, y: GROUND_Y - 70 - (i % 2) * 20, w: 50 + i * 5, type: i % 2 }));
+}
 
 // ==================== PLAYER ====================
 let player = {};
@@ -389,7 +586,8 @@ function updatePlayer(dt) {
 
   // Battery drain
   if (player.flashlight) {
-    player.battery = Math.max(0, player.battery - 0.08 * (dt / 16.67));
+    const drainRate = levelData.batteryDrainRate !== undefined ? levelData.batteryDrainRate : 0.08;
+    player.battery = Math.max(0, player.battery - drainRate * (dt / 16.67));
     if (player.battery <= 0) player.flashlight = false;
   }
 
@@ -460,7 +658,12 @@ function updatePlayer(dt) {
     const px = player.x + PLAYER_W / 2;
     if (px >= exitDoor.x && px <= exitDoor.x + exitDoor.w + 10) {
       player.won = true;
-      state = 'win';
+      if (currentLevel < 4) {
+        state = 'levelComplete';
+        frameCount = 0;
+      } else {
+        state = 'win';
+      }
     }
   }
 
@@ -481,24 +684,40 @@ function updatePlayer(dt) {
 
 // ==================== ENTITY ====================
 let entity = {};
+let entity2 = null;
 function resetEntity() {
   entity = {
-    x: 2000, y: GROUND_Y - ENTITY_H,
-    vx: 1.5,
+    x: levelData.entityStart,
+    y: GROUND_Y - ENTITY_H,
+    vx: 1,
     state: 'patrol',
-    patrolLeft: 1800,
-    patrolRight: 2400,
+    patrolLeft: levelData.entityPatrolLeft,
+    patrolRight: levelData.entityPatrolRight,
     sway: 0,
     swayDir: 1,
     attackTimer: 0,
   };
+  if (currentLevel === 4) {
+    entity2 = {
+      x: 400,
+      y: GROUND_Y - ENTITY_H,
+      vx: -1,
+      state: 'patrol',
+      patrolLeft: 200,
+      patrolRight: 1000,
+      sway: 0,
+      swayDir: 1,
+    };
+  } else {
+    entity2 = null;
+  }
 }
 
 function updateEntity(dt) {
   if (player.dead || player.won) return;
 
   const allKeysCollected = player.keysCollected >= 3;
-  const speed = allKeysCollected ? 4.0 : (entity.state === 'hunt' ? 3.0 : 1.5);
+  const speed = allKeysCollected ? levelData.speedFinal : (entity.state === 'hunt' ? levelData.speedHunt : levelData.speedPatrol);
 
   // State machine
   if (allKeysCollected) {
@@ -561,6 +780,64 @@ function updateEntity(dt) {
     entityProximityTimer = 0;
     playEntityProximity(entity.x, player.x);
   }
+
+  // Update entity2 on level 5
+  if (currentLevel === 4 && entity2) {
+    updateEntity2(dt);
+  }
+}
+
+function updateEntity2(dt) {
+  if (player.dead || player.won) return;
+  const allKeysCollected = player.keysCollected >= 3;
+  const speed = allKeysCollected ? levelData.speedFinal : (entity2.state === 'hunt' ? levelData.speedHunt : levelData.speedPatrol);
+
+  // State machine
+  if (allKeysCollected) {
+    entity2.state = 'hunt';
+  } else {
+    let attracted = false;
+    const dist = Math.abs(entity2.x - player.x);
+    if (player.flashlight && !player.hiding) {
+      const flashDir = player.vx >= 0 ? 1 : -1;
+      const entityDir = entity2.x > player.x ? 1 : -1;
+      if (flashDir === entityDir && dist < 350) attracted = true;
+    }
+    if (Math.abs(player.vx) > 1.5 && dist < 400 && !player.hiding) attracted = true;
+    if (player.fear > 60 && dist < 500 && !player.hiding) attracted = true;
+    if (attracted && entity2.state !== 'hunt') {
+      entity2.state = 'hunt';
+    } else if (!attracted && entity2.state === 'hunt') {
+      entity2.state = 'patrol';
+    }
+  }
+
+  // Movement
+  if (entity2.state === 'patrol') {
+    entity2.x += entity2.vx * speed;
+    if (entity2.x <= entity2.patrolLeft) { entity2.x = entity2.patrolLeft; entity2.vx = 1; }
+    if (entity2.x >= entity2.patrolRight) { entity2.x = entity2.patrolRight; entity2.vx = -1; }
+  } else if (entity2.state === 'hunt') {
+    if (!player.hiding) {
+      const dir = player.x > entity2.x ? 1 : -1;
+      entity2.x += dir * speed;
+      entity2.vx = dir;
+    }
+  }
+
+  // Sway animation
+  entity2.sway += entity2.swayDir * 0.03 * (dt / 16.67);
+  if (Math.abs(entity2.sway) > 1) entity2.swayDir *= -1;
+
+  // Check attack
+  if (!player.hiding) {
+    const dist = Math.abs(entity2.x + ENTITY_W / 2 - (player.x + PLAYER_W / 2));
+    if (dist < 25) {
+      playEntityScreech();
+      player.dead = true;
+      state = 'dead';
+    }
+  }
 }
 
 // ==================== CAMERA ====================
@@ -575,7 +852,9 @@ function updateCamera() {
 function wx(worldX) { return worldX - camera.x; }
 
 function drawBackground() {
-  ctx.fillStyle = '#0a0a0f';
+  const bg = (levelData && levelData.bgColor) ? levelData.bgColor : '#0a0a0f';
+  const floor = (levelData && levelData.floorColor) ? levelData.floorColor : '#1a1a22';
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, BASE_W, BASE_H);
 
   // Ceiling
@@ -587,7 +866,7 @@ function drawBackground() {
   ctx.fillRect(0, 80, BASE_W, GROUND_Y - 80);
 
   // Ground
-  ctx.fillStyle = '#1a1a22';
+  ctx.fillStyle = floor;
   ctx.fillRect(0, GROUND_Y, BASE_W, BASE_H - GROUND_Y);
 
   // Ground edge highlight
@@ -896,6 +1175,38 @@ function drawEntity() {
   ctx.restore();
 }
 
+function drawEntity2() {
+  if (!entity2) return;
+  const sx = wx(entity2.x);
+  if (sx < -50 || sx > BASE_W + 50) return;
+  const sway = Math.sin(entity2.sway) * 3;
+  ctx.save();
+  ctx.translate(sx + sway, entity2.y);
+  ctx.fillStyle = '#080810';
+  ctx.fillRect(0, 10, ENTITY_W, ENTITY_H - 10);
+  ctx.beginPath();
+  ctx.ellipse(ENTITY_W / 2, 5, 9, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#1e1e30';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(0, 10, ENTITY_W, ENTITY_H - 10);
+  ctx.strokeStyle = '#1a1a30';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.ellipse(ENTITY_W / 2, 5, 9, 12, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  const armSway = Math.sin(entity2.sway * 1.5) * 5;
+  ctx.strokeStyle = '#0c0c18';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(0, 20); ctx.lineTo(-10, 35 + armSway);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(ENTITY_W, 20); ctx.lineTo(ENTITY_W + 10, 35 - armSway);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function applyFlashlightMask() {
   if (!player.flashlight || player.hiding) return;
   const sx = wx(player.x) + PLAYER_W / 2 + player.shakeX;
@@ -1043,6 +1354,12 @@ function drawUI() {
   ctx.font = '9px monospace';
   ctx.textAlign = 'left';
   ctx.fillText(player.flashlight ? 'LIGHT ON' : 'LIGHT OFF', 118, 30);
+
+  // Level indicator
+  ctx.fillStyle = 'rgba(180,180,160,0.7)';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(`WARD ${currentLevel + 1}/5`, 10, 35);
 
   ctx.globalAlpha = 1;
   ctx.textAlign = 'left';
@@ -1215,11 +1532,11 @@ function drawWinScreen() {
     ctx.textAlign = 'center';
     ctx.fillStyle = `rgba(30, 60, 30, ${alpha})`;
     ctx.font = 'bold 46px serif';
-    ctx.fillText('YOU ESCAPED', BASE_W / 2, BASE_H / 2 - 20);
+    ctx.fillText('YOU ESCAPED', BASE_W / 2, BASE_H / 2 - 40);
     ctx.fillStyle = `rgba(50, 80, 50, ${alpha})`;
     ctx.font = '14px monospace';
-    ctx.fillText('You left Ward 13 behind.', BASE_W / 2, BASE_H / 2 + 20);
-    ctx.fillText('...or did you?', BASE_W / 2, BASE_H / 2 + 42);
+    ctx.fillText('ALL WARDS CLEARED', BASE_W / 2, BASE_H / 2 - 10);
+    ctx.fillText('You escaped Echoes of Ward 13.', BASE_W / 2, BASE_H / 2 + 15);
     const blink = Math.floor(frameCount / 30) % 2 === 0;
     if (blink && prog > 0.9) {
       ctx.fillStyle = `rgba(60, 80, 60, ${alpha})`;
@@ -1231,14 +1548,55 @@ function drawWinScreen() {
   frameCount++;
 }
 
+function drawLevelComplete() {
+  const prog = Math.min(1, frameCount / 90);
+  ctx.fillStyle = `rgba(0,0,0,${prog * 0.85})`;
+  ctx.fillRect(0, 0, BASE_W, BASE_H);
+
+  if (prog > 0.4) {
+    const alpha = (prog - 0.4) / 0.6;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(180, 30, 30, ${alpha})`;
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText(`LEVEL ${currentLevel + 1} COMPLETE`, BASE_W / 2, BASE_H / 2 - 50);
+    ctx.fillStyle = `rgba(200, 200, 180, ${alpha})`;
+    ctx.font = 'bold 28px serif';
+    ctx.fillText(LEVELS[currentLevel].name.toUpperCase(), BASE_W / 2, BASE_H / 2 - 15);
+    ctx.fillStyle = `rgba(160, 160, 140, ${alpha})`;
+    ctx.font = '13px monospace';
+    ctx.fillText(LEVELS[currentLevel + 1] ? `Next: ${LEVELS[currentLevel + 1].name}` : 'Final level awaits...', BASE_W / 2, BASE_H / 2 + 18);
+    const blink = Math.floor(frameCount / 25) % 2 === 0;
+    if (blink && prog > 0.8) {
+      ctx.fillStyle = `rgba(140, 140, 120, ${alpha})`;
+      ctx.font = '11px monospace';
+      ctx.fillText('PRESS ANY KEY OR TAP TO CONTINUE', BASE_W / 2, BASE_H / 2 + 55);
+    }
+    ctx.restore();
+  }
+  frameCount++;
+}
+
 // ==================== GAME INIT ====================
-function startGame() {
-  initAudio();
+function advanceLevel() {
+  loadLevel(currentLevel + 1);
   resetPlayer();
   resetEntity();
-  for (const bat of batteries) bat.collected = false;
-  for (const ki of keyItems) ki.collected = false;
-  for (const lk of lockers) lk.cooldown = 0;
+  camera.x = 0;
+  frameCount = 0;
+  lastFootstep = 0;
+  lastHeartbeatTime = 0;
+  entityProximityTimer = 0;
+  state = 'playing';
+  btnFlashPressedThisFrame = false;
+  btnHidePressedThisFrame = false;
+}
+
+function startGame() {
+  initAudio();
+  loadLevel(0);
+  resetPlayer();
+  resetEntity();
   camera.x = 0;
   frameCount = 0;
   lastFootstep = 0;
@@ -1276,6 +1634,13 @@ function gameLoop(ts) {
   if (state === 'win') {
     renderGame();
     drawWinScreen();
+    ctx.restore();
+    return;
+  }
+
+  if (state === 'levelComplete') {
+    renderGame();
+    drawLevelComplete();
     ctx.restore();
     return;
   }
@@ -1326,13 +1691,18 @@ function renderGame() {
   // 8. Entity (draw behind darkness so flashlight reveals it)
   drawEntity();
 
+  // 8b. Entity2 on level 5
+  if (currentLevel === 4 && entity2) {
+    drawEntity2();
+  }
+
   // 9. Player
   drawPlayer();
 
   ctx.restore();
 
   // 10. Flashlight overlay (darkness with cone cutout)
-  if (state === 'playing' || state === 'dead' || state === 'win') {
+  if (state === 'playing' || state === 'dead' || state === 'win' || state === 'levelComplete') {
     if (player.flashlight && !player.hiding) {
       applyFlashlightMask();
     } else {
