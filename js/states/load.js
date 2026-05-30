@@ -2,7 +2,7 @@ var load = {
 	preload: function(){
 		console.log('Load: preload');
 		var loadLabel = this.add.text(80, 150, 'Loading...', {font: '30px Courier', fill: '#ffffff'}); //text on the screen to indicate the game is loading
-		game.load.path = '../game/assets/img/';
+		game.load.path = 'assets/img/';
 		//ground art but won't be seen
 		game.load.image('grass', 'platform.png');
 
@@ -97,7 +97,7 @@ var load = {
 
 
 		// file
-		game.load.path = '../game/assets/img/Files/';
+		game.load.path = 'assets/img/Files/';
 		game.load.image('stephanyFile', 'File 1 - Stephany.png');
 		game.load.image('viktorFile', 'File 2 - Viktor.png');
 		game.load.image('patientFile', 'File 3 - patientViktor.png');
@@ -106,14 +106,14 @@ var load = {
 
 		// clues
 		// Dr. Moretti
-		game.load.path = '../game/assets/img/Clues/Doctor Clues_ Dr. Moretti/';
+		game.load.path = 'assets/img/Clues/Doctor Clues_ Dr. Moretti/';
 		game.load.image('complaint', 'complaint.png');
 		game.load.image('news article', 'news article.png');
 		game.load.image('random patient', 'random patient.png');
 		game.load.image('speech bubble', 'speech bubble.png');
 		game.load.image('welcome letter', 'welcome letter.png');
 		// Viktor, Stephany
-		game.load.path = '../game/assets/img/Clues/Player Clues_  Viktor Kreshnov, Stephany Kreshnov/';
+		game.load.path = 'assets/img/Clues/Player Clues_  Viktor Kreshnov, Stephany Kreshnov/';
 		game.load.image('contract', 'contract.png');
 		game.load.atlas('coughingDaughter', 'Daughter/cough.png', 'Daughter/cough.json');
 		game.load.atlas('daughter', 'Daughter/daughter.png', 'Daughter/daughter.json');
@@ -140,7 +140,7 @@ var load = {
 		game.load.image('tool 4', 'tool 4.png');
 		game.load.image('tool 5', 'tool 5.png');
 		// Petronov (predecessor)
-		game.load.path = '../game/assets/img/Clues/Predecessor Clues_  Petronov Rozhok/';
+		game.load.path = 'assets/img/Clues/Predecessor Clues_  Petronov Rozhok/';
 		game.load.image('2 news article', '2 news article.png'); // 19
 		game.load.image('corpse tag', 'corpse tag.png');
 		game.load.image('corpse', 'corpse.png');
@@ -149,7 +149,7 @@ var load = {
 
 
 		// notes
-		game.load.path = '../game/assets/img/';
+		game.load.path = 'assets/img/';
 		game.load.image('newsArticle', 'newsArticle.png');
 		game.load.image('medCabinet', 'medicalCabinet.jpg');
 		game.load.image('wheelChair', 'wheelchair.png');
@@ -172,7 +172,7 @@ var load = {
 		
 
 		// load in level files
-		game.load.path = '../game/data/';
+		game.load.path = 'data/';
 		game.load.json('level0', 'Level0-StartRoom.json');
 		game.load.json('level1', 'Level1-Hallway.json');
 		game.load.json('level2', 'Level2-HallwayF2.json');
@@ -205,7 +205,7 @@ var load = {
 		game.load.json('labRoomBurnt8', 'labRoomBurnt8.json');
 
 		// sound
-		game.load.path = '../game/assets/audio/';
+		game.load.path = 'assets/audio/';
 		game.load.audio('hospitalMusic', 'hospitalMusic.mp3');
 		game.load.audio('indoorFootsteps', 'indoorFootsteps.mp3');
 		game.load.audio('doorOpenClose', 'doorOpenClose.mp3');
