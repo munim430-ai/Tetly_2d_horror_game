@@ -167,6 +167,8 @@ let state = 'start'; // start, playing, dead, win, levelComplete
 let frameCount = 0;
 let heartbeatTimer = 0;
 let entityProximityTimer = 0;
+let levelIntroTimer = 0;
+let deathFlashTimer = 0;
 let currentLevel = 0;
 let levelData = {};
 
@@ -306,7 +308,7 @@ const LEVELS = [
     speedPatrol: 1.5,
     speedHunt: 3.0,
     speedFinal: 4.0,
-    batteryDrainRate: 0.08,
+    batteryDrainRate: 0.06,
     obstacles: [
       { x: 240, y: GROUND_Y - 30, w: 60, h: 30, type: 'bed' },
       { x: 390, y: 300, w: 20, h: GROUND_Y - 300, type: 'wall' },
@@ -623,6 +625,12 @@ function updatePlayer(dt) {
   if (player.hiding) fearDelta = -0.05 * (dt / 16.67);
   player.fear = Math.max(0, Math.min(100, player.fear + fearDelta));
 
+  // Passive fear decay when flashlight on and entity is distant
+  const entityDist2 = Math.abs(entity.x - player.x);
+  if (player.flashlight && entityDist2 > 500 && !player.hiding) {
+    player.fear = Math.max(0, player.fear - 0.015 * (dt / 16.67));
+  }
+
   // Fear screen shake
   if (player.fear > 80) {
     player.shakeX = (Math.random() - 0.5) * 4 * ((player.fear - 80) / 20);
@@ -727,7 +735,7 @@ function resetEntity() {
       vx: -1,
       state: 'patrol',
       patrolLeft: 200,
-      patrolRight: 1000,
+      patrolRight: 2200,
       sway: 0,
       swayDir: 1,
       huntCooldown: 0,
@@ -759,7 +767,7 @@ function updateEntity(dt) {
     }
 
     // Running footsteps
-    if (Math.abs(player.vx) > 1.5 && dist < 400 && !player.hiding) attracted = true;
+    if (Math.abs(player.vx) > 2.0 && dist < 400 && !player.hiding) attracted = true;
 
     // Heartbeat at high fear
     if (player.fear > 60 && dist < 500 && !player.hiding) attracted = true;
@@ -847,7 +855,7 @@ function updateEntity2(dt) {
       const entityDir = entity2.x > player.x ? 1 : -1;
       if (flashDir === entityDir && dist < 350) attracted = true;
     }
-    if (Math.abs(player.vx) > 1.5 && dist < 400 && !player.hiding) attracted = true;
+    if (Math.abs(player.vx) > 2.0 && dist < 400 && !player.hiding) attracted = true;
     if (player.fear > 60 && dist < 500 && !player.hiding) attracted = true;
     if (attracted) {
       entity2.state = 'hunt';
@@ -916,46 +924,181 @@ function updateCamera() {
 function wx(worldX) { return worldX - camera.x; }
 
 function drawBackground() {
-  const bg = (levelData && levelData.bgColor) ? levelData.bgColor : '#0a0a0f';
+  const bg    = (levelData && levelData.bgColor)    ? levelData.bgColor    : '#0a0a0f';
   const floor = (levelData && levelData.floorColor) ? levelData.floorColor : '#1a1a22';
+
+  // Base fill
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, BASE_W, BASE_H);
 
-  // Ceiling
-  ctx.fillStyle = '#0d0d14';
-  ctx.fillRect(0, 0, BASE_W, 80);
+  if (currentLevel === 0) {
+    // Level 1 — The Morgue: blue-grey hospital interior
+    ctx.fillStyle = '#0d0d16';
+    ctx.fillRect(0, 0, BASE_W, 75);                        // ceiling strip
+    ctx.fillStyle = '#0f0f1a';
+    ctx.fillRect(0, 75, BASE_W, GROUND_Y - 75);            // wall
+    ctx.fillStyle = floor;
+    ctx.fillRect(0, GROUND_Y, BASE_W, BASE_H - GROUND_Y);
+    ctx.fillStyle = '#22222e';
+    ctx.fillRect(0, GROUND_Y, BASE_W, 3);                  // floor edge
+    // Ceiling pipe brackets every 180px
+    for (let xi = 0; xi < WORLD_W; xi += 180) {
+      const sx = wx(xi); if (sx < -10 || sx > BASE_W + 10) continue;
+      ctx.fillStyle = '#111119'; ctx.fillRect(sx, 18, 8, 57);
+    }
+    // Wall cracks
+    ctx.strokeStyle = '#111118'; ctx.lineWidth = 1;
+    for (let xi = 0; xi < WORLD_W; xi += 250) {
+      const sx = wx(xi); if (sx < -50 || sx > BASE_W + 50) continue;
+      ctx.beginPath(); ctx.moveTo(sx+10,100); ctx.lineTo(sx+25,132); ctx.lineTo(sx+15,162); ctx.stroke();
+    }
 
-  // Wall behind ground
-  ctx.fillStyle = '#0f0f18';
-  ctx.fillRect(0, 80, BASE_W, GROUND_Y - 80);
+  } else if (currentLevel === 1) {
+    // Level 2 — The Basement: dark green, low ceiling, industrial pipes
+    ctx.fillStyle = '#040a04';
+    ctx.fillRect(0, 0, BASE_W, 55);                        // low ceiling
+    ctx.fillStyle = '#080e08';
+    ctx.fillRect(0, 55, BASE_W, GROUND_Y - 55);
+    ctx.fillStyle = floor;
+    ctx.fillRect(0, GROUND_Y, BASE_W, BASE_H - GROUND_Y);
+    ctx.fillStyle = '#161e16'; ctx.fillRect(0, GROUND_Y, BASE_W, 3);
+    // Horizontal pipes running across ceiling
+    ctx.strokeStyle = '#0f1a0f'; ctx.lineWidth = 6;
+    for (let yi = 15; yi < 50; yi += 18) {
+      ctx.beginPath(); ctx.moveTo(0, yi); ctx.lineTo(BASE_W, yi); ctx.stroke();
+    }
+    // Vertical pipe drops from ceiling every 200px
+    ctx.lineWidth = 4;
+    for (let xi = 0; xi < WORLD_W; xi += 200) {
+      const sx = wx(xi); if (sx < -5 || sx > BASE_W + 5) continue;
+      ctx.strokeStyle = '#0e180e';
+      ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, 55 + (xi % 60)); ctx.stroke();
+      // drip stain on floor
+      ctx.fillStyle = '#0a120a';
+      ctx.beginPath(); ctx.ellipse(sx, GROUND_Y + 4, 6, 3, 0, 0, Math.PI*2); ctx.fill();
+    }
+    // Steam vent marks on wall
+    ctx.fillStyle = '#0d140d';
+    for (let xi = 100; xi < WORLD_W; xi += 350) {
+      const sx = wx(xi); if (sx < -20 || sx > BASE_W + 20) continue;
+      ctx.fillRect(sx, 130, 18, 8);
+    }
 
-  // Ground
-  ctx.fillStyle = floor;
-  ctx.fillRect(0, GROUND_Y, BASE_W, BASE_H - GROUND_Y);
+  } else if (currentLevel === 2) {
+    // Level 3 — Patient Corridors: purple-grey, cell-door marks on walls
+    ctx.fillStyle = '#0c0a14';
+    ctx.fillRect(0, 0, BASE_W, 70);
+    ctx.fillStyle = '#100e1a';
+    ctx.fillRect(0, 70, BASE_W, GROUND_Y - 70);
+    ctx.fillStyle = floor;
+    ctx.fillRect(0, GROUND_Y, BASE_W, BASE_H - GROUND_Y);
+    ctx.fillStyle = '#1e1c28'; ctx.fillRect(0, GROUND_Y, BASE_W, 3);
+    // Recessed door-frame marks every 280px on upper wall
+    ctx.strokeStyle = '#141220'; ctx.lineWidth = 1.5;
+    for (let xi = 60; xi < WORLD_W; xi += 280) {
+      const sx = wx(xi); if (sx < -30 || sx > BASE_W + 30) continue;
+      ctx.strokeRect(sx, 80, 28, 90);          // door frame
+      ctx.beginPath(); ctx.arc(sx+14, 160, 3, 0, Math.PI*2); ctx.stroke(); // knob
+    }
+    // Ceiling fluorescent light strips
+    ctx.fillStyle = '#16142020';
+    for (let xi = 0; xi < WORLD_W; xi += 240) {
+      const sx = wx(xi); if (sx < -10 || sx > BASE_W + 10) continue;
+      ctx.fillStyle = '#1a182a'; ctx.fillRect(sx, 5, 60, 10);
+      // dim glow under light
+      const g = ctx.createLinearGradient(sx+30, 15, sx+30, 60);
+      g.addColorStop(0, 'rgba(120,100,200,0.04)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(sx, 15, 60, 45);
+    }
+    // Wall number stencils
+    ctx.fillStyle = '#1c1a26'; ctx.font = 'bold 18px monospace'; ctx.textAlign = 'left';
+    for (let xi = 120; xi < WORLD_W; xi += 280) {
+      const sx = wx(xi); if (sx < 0 || sx > BASE_W) continue;
+      ctx.fillText(String(Math.floor(xi/100)).padStart(2,'0'), sx, 175);
+    }
 
-  // Ground edge highlight
-  ctx.fillStyle = '#22222e';
-  ctx.fillRect(0, GROUND_Y, BASE_W, 3);
+  } else if (currentLevel === 3) {
+    // Level 4 — Operating Theatre: near-black, surgical lights, tile floor
+    ctx.fillStyle = '#060606';
+    ctx.fillRect(0, 0, BASE_W, 65);
+    ctx.fillStyle = '#090909';
+    ctx.fillRect(0, 65, BASE_W, GROUND_Y - 65);
+    ctx.fillStyle = floor;
+    ctx.fillRect(0, GROUND_Y, BASE_W, BASE_H - GROUND_Y);
+    ctx.fillStyle = '#181818'; ctx.fillRect(0, GROUND_Y, BASE_W, 3);
+    // Floor tile grid
+    ctx.strokeStyle = '#111111'; ctx.lineWidth = 0.5;
+    for (let xi = 0; xi < WORLD_W; xi += 60) {
+      const sx = wx(xi); if (sx < 0 || sx > BASE_W) continue;
+      ctx.beginPath(); ctx.moveTo(sx, GROUND_Y); ctx.lineTo(sx, BASE_H); ctx.stroke();
+    }
+    // Overhead surgical lights hanging from ceiling every 320px
+    for (let xi = 80; xi < WORLD_W; xi += 320) {
+      const sx = wx(xi); if (sx < -40 || sx > BASE_W + 40) continue;
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(sx - 2, 0, 4, 45);           // cord
+      ctx.beginPath(); ctx.arc(sx, 50, 18, 0, Math.PI*2);
+      ctx.fillStyle = '#131313'; ctx.fill();
+      ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1; ctx.stroke();
+      // faint cone under light
+      const cone = ctx.createRadialGradient(sx, 50, 5, sx, 50, 80);
+      cone.addColorStop(0, 'rgba(200,220,180,0.05)');
+      cone.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = cone;
+      ctx.beginPath(); ctx.moveTo(sx-80,GROUND_Y); ctx.lineTo(sx+80,GROUND_Y); ctx.lineTo(sx+20,50); ctx.lineTo(sx-20,50); ctx.closePath(); ctx.fill();
+    }
+    // Ceiling air vent marks
+    ctx.fillStyle = '#0e0e0e';
+    for (let xi = 200; xi < WORLD_W; xi += 280) {
+      const sx = wx(xi); if (sx < 0 || sx > BASE_W) continue;
+      ctx.fillRect(sx, 8, 30, 20);
+      ctx.strokeStyle = '#141414'; ctx.lineWidth = 0.5;
+      for (let vi = 0; vi < 5; vi++) { ctx.beginPath(); ctx.moveTo(sx, 10+vi*3); ctx.lineTo(sx+30, 10+vi*3); ctx.stroke(); }
+    }
 
-  // Ceiling pipes/lines
-  for (let xi = 0; xi < WORLD_W; xi += 180) {
-    const sx = wx(xi);
-    if (sx < -10 || sx > BASE_W + 10) continue;
-    ctx.fillStyle = '#111119';
-    ctx.fillRect(sx, 20, 8, 60);
-  }
-
-  // Wall crack marks
-  ctx.strokeStyle = '#111118';
-  ctx.lineWidth = 1;
-  for (let xi = 0; xi < WORLD_W; xi += 250) {
-    const sx = wx(xi);
-    if (sx < -50 || sx > BASE_W + 50) continue;
-    ctx.beginPath();
-    ctx.moveTo(sx + 10, 100);
-    ctx.lineTo(sx + 25, 130);
-    ctx.lineTo(sx + 15, 160);
-    ctx.stroke();
+  } else {
+    // Level 5 — The Rooftop: outdoor night sky, no ceiling, stars, distant skyline
+    // Night sky gradient
+    const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+    sky.addColorStop(0, '#02020a');
+    sky.addColorStop(0.6, '#050510');
+    sky.addColorStop(1, '#08081a');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, BASE_W, GROUND_Y);
+    // Concrete/gravel floor
+    ctx.fillStyle = floor; ctx.fillRect(0, GROUND_Y, BASE_W, BASE_H - GROUND_Y);
+    ctx.fillStyle = '#16161e'; ctx.fillRect(0, GROUND_Y, BASE_W, 3);
+    // Stars (deterministic)
+    ctx.fillStyle = 'rgba(200,210,255,0.5)';
+    for (let i = 0; i < 60; i++) {
+      const sx = ((i * 137 + camera.x * 0.02) % BASE_W);
+      const sy = (i * 97) % (GROUND_Y - 30);
+      const r = (i % 3 === 0) ? 1.2 : 0.7;
+      ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2); ctx.fill();
+    }
+    // Distant city skyline silhouette
+    ctx.fillStyle = '#04040e';
+    const buildings = [50,90,60,110,70,130,55,80,100,65,120,75,45,95];
+    let bx = 0;
+    for (const bh of buildings) {
+      const bw = 35 + (bx % 20);
+      ctx.fillRect(bx, GROUND_Y - bh - 60, bw, bh);
+      bx += bw + 5;
+    }
+    // Moon
+    ctx.fillStyle = 'rgba(220,210,180,0.12)';
+    ctx.beginPath(); ctx.arc(BASE_W - 60 - (camera.x * 0.01 % 30), 55, 22, 0, Math.PI*2); ctx.fill();
+    // Rooftop ledge/parapet at ground level
+    ctx.fillStyle = '#0e0e18';
+    ctx.fillRect(0, GROUND_Y - 8, BASE_W, 8);
+    // Roof vents/AC units
+    ctx.fillStyle = '#0c0c16';
+    for (let xi = 300; xi < WORLD_W; xi += 600) {
+      const sx = wx(xi); if (sx < -30 || sx > BASE_W + 30) continue;
+      ctx.fillRect(sx, GROUND_Y - 30, 50, 22);
+      ctx.strokeStyle = '#141420'; ctx.lineWidth = 1;
+      ctx.strokeRect(sx, GROUND_Y - 30, 50, 22);
+    }
   }
 }
 
@@ -1602,6 +1745,12 @@ function drawStartScreen() {
 }
 
 function drawDeadScreen() {
+  deathFlashTimer += 16;
+  const flashAlpha = Math.max(0, 0.7 - deathFlashTimer / 500);
+  if (flashAlpha > 0) {
+    ctx.fillStyle = `rgba(180,0,0,${flashAlpha})`;
+    ctx.fillRect(0, 0, BASE_W, BASE_H);
+  }
   ctx.fillStyle = 'rgba(0,0,0,0.7)';
   ctx.fillRect(0, 0, BASE_W, BASE_H);
   const flash = Math.min(1, (frameCount % 60) / 30);
@@ -1719,9 +1868,30 @@ function advanceLevel() {
   lastFootstep = 0;
   lastHeartbeatTime = 0;
   entityProximityTimer = 0;
-  state = 'playing';
+  deathFlashTimer = 0;
+  state = 'levelIntro';
+  levelIntroTimer = 0;
   btnFlashPressedThisFrame = false;
   btnHidePressedThisFrame = false;
+}
+
+function drawLevelIntro() {
+  const prog = Math.min(1, levelIntroTimer / 2500);
+  const alpha = prog < 0.15 ? prog / 0.15 : prog > 0.75 ? (1 - prog) / 0.25 : 1;
+  ctx.save();
+  ctx.fillStyle = `rgba(0,0,0,${alpha * 0.82})`;
+  ctx.fillRect(0, 0, BASE_W, BASE_H);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = `rgba(180,40,40,${alpha})`;
+  ctx.font = 'bold 11px monospace';
+  ctx.fillText(`WARD ${currentLevel + 1}`, BASE_W/2, BASE_H/2 - 38);
+  ctx.fillStyle = `rgba(210,200,180,${alpha})`;
+  ctx.font = 'bold 26px serif';
+  ctx.fillText(levelData.name.toUpperCase(), BASE_W/2, BASE_H/2 - 8);
+  ctx.fillStyle = `rgba(160,150,130,${alpha})`;
+  ctx.font = '12px monospace';
+  ctx.fillText(levelData.description, BASE_W/2, BASE_H/2 + 22);
+  ctx.restore();
 }
 
 function startGame() {
@@ -1734,7 +1904,9 @@ function startGame() {
   lastFootstep = 0;
   lastHeartbeatTime = 0;
   entityProximityTimer = 0;
-  state = 'playing';
+  deathFlashTimer = 0;
+  state = 'levelIntro';
+  levelIntroTimer = 0;
   btnFlashPressedThisFrame = false;
   btnHidePressedThisFrame = false;
 }
@@ -1755,6 +1927,15 @@ function gameLoop(ts) {
     return;
   }
 
+  if (state === 'levelIntro') {
+    levelIntroTimer += dt;
+    renderGame();
+    drawLevelIntro();
+    if (levelIntroTimer >= 2500) state = 'playing';
+    ctx.restore();
+    return;
+  }
+
   if (state === 'dead') {
     // Draw game behind
     renderGame();
@@ -1762,6 +1943,7 @@ function gameLoop(ts) {
     ctx.restore();
     return;
   }
+
 
   if (state === 'win') {
     renderGame();
@@ -1804,7 +1986,9 @@ function gameLoop(ts) {
 
 function renderGame() {
   ctx.save();
-  ctx.translate(player.shakeX, player.shakeY);
+  const shakeX = (state === 'dead' && deathFlashTimer < 400) ? (Math.random() - 0.5) * 10 : player.shakeX;
+  const shakeY = (state === 'dead' && deathFlashTimer < 400) ? (Math.random() - 0.5) * 6  : player.shakeY;
+  ctx.translate(shakeX, shakeY);
 
   // 1. Background
   drawBackground();
