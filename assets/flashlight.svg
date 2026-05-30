@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" width="60" height="30">
+  <defs>
+    <!-- Lens radial gradient: white center fading out -->
+    <radialGradient id="lens" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="white"   stop-opacity="1"/>
+      <stop offset="45%"  stop-color="#ffffcc" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#888800" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Light cone gradient: yellow fading to transparent -->
+    <linearGradient id="cone" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%"   stop-color="#ffee44" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffee44" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="60" height="30" fill="#0a0a0f"/>
+
+  <!-- Light cone: triangle pointing right from lens at x=43,y=15 -->
+  <!-- Cone spans from lens tip to right edge, fanning out vertically -->
+  <polygon points="43,15 60,4 60,26"
+           fill="url(#cone)"/>
+
+  <!-- Flashlight body: rounded rect 40x16, starting x=3, centered y=7..23 -->
+  <rect x="3" y="7" width="40" height="16" rx="5"
+        fill="#2a2a36" stroke="#3a3a50" stroke-width="1"/>
+
+  <!-- Body detail: grip bands -->
+  <line x1="10" y1="8"  x2="10" y2="22" stroke="#1e1e28" stroke-width="1.5"/>
+  <line x1="14" y1="8"  x2="14" y2="22" stroke="#1e1e28" stroke-width="1.5"/>
+  <line x1="18" y1="8"  x2="18" y2="22" stroke="#1e1e28" stroke-width="1.5"/>
+
+  <!-- Power button on top body -->
+  <circle cx="28" cy="7" r="2.5" fill="#1a1a24" stroke="#444460" stroke-width="0.8"/>
+
+  <!-- Lens circle: r=9, centered at right of body (42,15) -->
+  <circle cx="42" cy="15" r="9"
+          fill="url(#lens)" stroke="#555570" stroke-width="0.8"/>
+
+  <!-- Lens inner bright ring -->
+  <circle cx="42" cy="15" r="5"
+          fill="none" stroke="rgba(255,255,200,0.4)" stroke-width="1"/>
+</svg>

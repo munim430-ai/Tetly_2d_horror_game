@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 80" width="40" height="80">
+  <!-- Background -->
+  <rect width="40" height="80" fill="#0a0a0f"/>
+
+  <!-- Locker body: 32x70, centered at x=4..36 -->
+  <rect x="4" y="5" width="32" height="70" rx="1"
+        fill="#1e1e26" stroke="#2e2e3e" stroke-width="1.5"/>
+
+  <!-- Horizontal seam line in the middle (y=40) -->
+  <line x1="4" y1="40" x2="36" y2="40"
+        stroke="#2e2e3e" stroke-width="1.2"/>
+
+  <!-- Vertical ventilation slots top section -->
+  <line x1="12" y1="8"  x2="12" y2="18" stroke="#2a2a38" stroke-width="1"/>
+  <line x1="16" y1="8"  x2="16" y2="18" stroke="#2a2a38" stroke-width="1"/>
+  <line x1="20" y1="8"  x2="20" y2="18" stroke="#2a2a38" stroke-width="1"/>
+  <line x1="24" y1="8"  x2="24" y2="18" stroke="#2a2a38" stroke-width="1"/>
+  <line x1="28" y1="8"  x2="28" y2="18" stroke="#2a2a38" stroke-width="1"/>
+
+  <!-- Ventilation slots bottom section -->
+  <line x1="12" y1="43" x2="12" y2="53" stroke="#2a2a38" stroke-width="1"/>
+  <line x1="16" y1="43" x2="16" y2="53" stroke="#2a2a38" stroke-width="1"/>
+  <line x1="20" y1="43" x2="20" y2="53" stroke="#2a2a38" stroke-width="1"/>
+  <line x1="24" y1="43" x2="24" y2="53" stroke="#2a2a38" stroke-width="1"/>
+  <line x1="28" y1="43" x2="28" y2="53" stroke="#2a2a38" stroke-width="1"/>
+
+  <!-- Handle top section: small circle on right side at (31, 22) -->
+  <circle cx="31" cy="22" r="2.5"
+          fill="none" stroke="#3a3a50" stroke-width="1.5"/>
+
+  <!-- Handle bottom section -->
+  <circle cx="31" cy="58" r="2.5"
+          fill="none" stroke="#3a3a50" stroke-width="1.5"/>
+</svg>

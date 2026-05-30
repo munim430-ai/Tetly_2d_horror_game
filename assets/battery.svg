@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 25" width="40" height="25">
+  <!-- Background -->
+  <rect width="40" height="25" fill="#0a0a0f"/>
+
+  <!-- Battery outline: 34x18px, top-left at (1, 2) -->
+  <rect x="1" y="2" width="34" height="18" rx="2"
+        fill="none" stroke="#40c040" stroke-width="2"/>
+
+  <!-- Positive terminal nub: 4x8px on right side -->
+  <rect x="35" y="9" width="4" height="8" rx="1" fill="#40c040"/>
+
+  <!-- Charge fill bar: ~60% of 30px inner = 18px wide, inside at x=3,y=4 with 2px padding -->
+  <rect x="3" y="4" width="20" height="14" rx="1" fill="#40c040"/>
+
+  <!-- Label "BATT" below in white monospace tiny text -->
+  <text x="5" y="24"
+        font-family="'Courier New', Courier, monospace"
+        font-size="5"
+        fill="white"
+        letter-spacing="1">BATT</text>
+</svg>

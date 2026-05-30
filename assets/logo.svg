@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <defs>
+    <!-- Red glow filter for title text -->
+    <filter id="redGlow" x="-20%" y="-40%" width="140%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="6"
+                    flood-color="#8b0000" flood-opacity="0.9" result="s1"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="12"
+                    flood-color="#cc0000" flood-opacity="0.55" result="s2"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="3"
+                    flood-color="#000000" flood-opacity="0.8"/>
+    </filter>
+
+    <!-- Subtle glow for tagline -->
+    <filter id="tagGlow" x="-10%" y="-50%" width="120%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2"
+                    flood-color="rgba(255,255,255,0.3)" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Pure black background -->
+  <rect width="400" height="120" fill="#000000"/>
+
+  <!-- Subtle background texture: very faint grid lines -->
+  <line x1="0"   y1="60" x2="400" y2="60" stroke="#0d0d0d" stroke-width="1"/>
+  <line x1="200" y1="0"  x2="200" y2="120" stroke="#0d0d0d" stroke-width="1"/>
+
+  <!-- Title: "ECHOES OF WARD 13" -->
+  <text x="200" y="56"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="42"
+        font-weight="bold"
+        fill="#8b0000"
+        text-anchor="middle"
+        filter="url(#redGlow)"
+        letter-spacing="2">ECHOES OF WARD 13</text>
+
+  <!-- Red separator line -->
+  <line x1="40" y1="68" x2="360" y2="68"
+        stroke="#6b0000" stroke-width="1" opacity="0.7"/>
+
+  <!-- Thin accent lines flanking separator -->
+  <line x1="40"  y1="66" x2="160" y2="66" stroke="#4a0000" stroke-width="0.5" opacity="0.5"/>
+  <line x1="240" y1="66" x2="360" y2="66" stroke="#4a0000" stroke-width="0.5" opacity="0.5"/>
+
+  <!-- Tagline below separator -->
+  <text x="200" y="90"
+        font-family="'Courier New', Courier, monospace"
+        font-size="14"
+        fill="white"
+        text-anchor="middle"
+        letter-spacing="3"
+        opacity="0.82"
+        filter="url(#tagGlow)">THE DARK HEARS YOUR HEARTBEAT</text>
+</svg>
