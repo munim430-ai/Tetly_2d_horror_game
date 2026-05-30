@@ -4,6 +4,9 @@
 # Node
 node_modules/
 
+# Locally cloned MCP servers (referenced by absolute path in .mcp.json)
+playwright-mcp/
+
 # OS
 .DS_Store
 Thumbs.db
