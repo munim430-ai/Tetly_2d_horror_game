@@ -1,59 +1,59 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 20" width="120" height="20">
   <defs>
-    <!-- Gradient fill: green at left (0%) to red at right (100%) -->
+    <!-- Gradient: green at 0% → yellow mid → red at 100% -->
     <linearGradient id="fearGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%"   stop-color="#40c040"/>
       <stop offset="50%"  stop-color="#c0a020"/>
       <stop offset="100%" stop-color="#c03020"/>
     </linearGradient>
 
-    <!-- Clip path for 65% fill (65px of 100px bar) -->
+    <!-- Clip path limiting fill to 65% of 100px bar = 65px -->
     <clipPath id="fearFill">
       <rect x="11" y="4" width="65" height="12"/>
     </clipPath>
 
-    <!-- Skull glow -->
+    <!-- Red glow for high-fear skull icon -->
     <filter id="skullGlow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="0" stdDeviation="1.5"
                     flood-color="#c03020" flood-opacity="0.7"/>
     </filter>
   </defs>
 
-  <!-- Background -->
+  <!-- Dark background -->
   <rect width="120" height="20" fill="#0a0a0f"/>
 
-  <!-- "FEAR" label -->
+  <!-- "FEAR" label on left -->
   <text x="2" y="13"
         font-family="'Courier New', Courier, monospace"
         font-size="8"
         fill="white"
         letter-spacing="0.5">FEAR</text>
 
-  <!-- Bar background (empty state) -->
+  <!-- Bar track (empty/background) -->
   <rect x="11" y="4" width="100" height="12" rx="2"
         fill="#1a1a22" stroke="#333344" stroke-width="0.8"/>
 
-  <!-- Fill bar at 65%: clipped gradient rect -->
+  <!-- Fill bar at 65%: gradient clipped to 65px -->
   <rect x="11" y="4" width="100" height="12" rx="2"
         fill="url(#fearGrad)"
         clip-path="url(#fearFill)"/>
 
-  <!-- Bar border overlay -->
+  <!-- Bar border overlay on top -->
   <rect x="11" y="4" width="100" height="12" rx="2"
         fill="none" stroke="#444455" stroke-width="0.8"/>
 
-  <!-- Skull icon on right (high fear indicator) at x=115, y=10 -->
+  <!-- Skull icon: translated to right edge at (115,10) -->
   <g filter="url(#skullGlow)" transform="translate(115,10)">
-    <!-- Skull cranium -->
+    <!-- Cranium -->
     <circle cx="0" cy="-2" r="3.2" fill="#c03020"/>
     <!-- Left eye socket -->
     <circle cx="-1.1" cy="-2.2" r="0.9" fill="#0a0a0f"/>
     <!-- Right eye socket -->
-    <circle cx="1.1" cy="-2.2" r="0.9" fill="#0a0a0f"/>
-    <!-- Jaw / teeth path -->
+    <circle cx="1.1"  cy="-2.2" r="0.9" fill="#0a0a0f"/>
+    <!-- Jaw -->
     <path d="M -2.4,0.4 Q -2.4,2.4 0,2.4 Q 2.4,2.4 2.4,0.4 Z"
           fill="#c03020"/>
-    <!-- Tooth gaps -->
+    <!-- Tooth gap lines -->
     <line x1="-0.7" y1="0.5" x2="-0.7" y2="2.1" stroke="#0a0a0f" stroke-width="0.6"/>
     <line x1="0.7"  y1="0.5" x2="0.7"  y2="2.1" stroke="#0a0a0f" stroke-width="0.6"/>
   </g>

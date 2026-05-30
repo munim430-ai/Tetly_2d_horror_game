@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 180" width="80" height="180">
   <defs>
-    <!-- Crimson glow aura radial gradient -->
-    <radialGradient id="aura" cx="50%" cy="45%" r="48%">
+    <!-- Crimson glow aura: radial gradient rgba(139,0,0,0.3) -->
+    <radialGradient id="aura" cx="50%" cy="44%" r="48%">
       <stop offset="0%"   stop-color="rgba(139,0,0,0.30)"/>
       <stop offset="60%"  stop-color="rgba(139,0,0,0.10)"/>
       <stop offset="100%" stop-color="rgba(139,0,0,0)"/>
     </radialGradient>
 
-    <!-- Red eye slit glow -->
-    <filter id="eyeGlow" x="-80%" y="-200%" width="260%" height="500%">
-      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+    <!-- Red eye slit bloom filter -->
+    <filter id="eyeGlow" x="-100%" y="-300%" width="300%" height="700%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -17,46 +17,45 @@
     </filter>
   </defs>
 
-  <!-- Background -->
+  <!-- Dark background -->
   <rect width="80" height="180" fill="#0a0a0f"/>
 
-  <!-- Aura glow behind figure -->
-  <ellipse cx="40" cy="80" rx="36" ry="80" fill="url(#aura)"/>
+  <!-- Crimson aura behind the figure -->
+  <ellipse cx="40" cy="82" rx="38" ry="82" fill="url(#aura)"/>
 
-  <!-- Body: tall thin, 18x70, centered at x=31..49, y=72..142 -->
-  <rect x="31" y="72" width="18" height="70"
-        fill="#0d0d14" stroke="#1a1a28" stroke-width="0.5"/>
-
-  <!-- Elongated oval head, centered at (40, 58), 14x18 -->
-  <ellipse cx="40" cy="55" rx="12" ry="17"
-           fill="#0d0d14" stroke="#1a1a28" stroke-width="0.5"/>
-
-  <!-- Neck -->
-  <rect x="36" y="70" width="8" height="5" fill="#0d0d14"/>
-
-  <!-- Left dangling arm: unnaturally long, drapes past waist -->
-  <line x1="31" y1="80" x2="18" y2="150"
+  <!-- Left dangling arm: unnaturally long, drapes well past waist -->
+  <line x1="31" y1="84" x2="16" y2="156"
+        stroke="#1a1a28" stroke-width="7" stroke-linecap="round" opacity="0.6"/>
+  <line x1="31" y1="84" x2="16" y2="156"
         stroke="#0d0d14" stroke-width="5" stroke-linecap="round"/>
-  <!-- arm shadow/edge -->
-  <line x1="31" y1="80" x2="18" y2="150"
-        stroke="#1a1a28" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
 
   <!-- Right dangling arm: unnaturally long -->
-  <line x1="49" y1="80" x2="62" y2="148"
+  <line x1="49" y1="84" x2="64" y2="154"
+        stroke="#1a1a28" stroke-width="7" stroke-linecap="round" opacity="0.6"/>
+  <line x1="49" y1="84" x2="64" y2="154"
         stroke="#0d0d14" stroke-width="5" stroke-linecap="round"/>
-  <line x1="49" y1="80" x2="62" y2="148"
-        stroke="#1a1a28" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Body: tall thin 18x70, centered at x=31..49, y=74..144 -->
+  <rect x="31" y="74" width="18" height="70" rx="2"
+        fill="#0d0d14" stroke="#1a1a28" stroke-width="0.6"/>
+
+  <!-- Neck -->
+  <rect x="36" y="68" width="8" height="8" fill="#0d0d14"/>
+
+  <!-- Head: elongated oval, centered at (40, 55), rx=12 ry=17 -->
+  <ellipse cx="40" cy="55" rx="12" ry="17"
+           fill="#0d0d14" stroke="#1a1a28" stroke-width="0.6"/>
 
   <!-- Legs -->
-  <rect x="32" y="140" width="7" height="28" rx="2"
-        fill="#0d0d14" stroke="#1a1a28" stroke-width="0.4"/>
-  <rect x="41" y="140" width="7" height="28" rx="2"
-        fill="#0d0d14" stroke="#1a1a28" stroke-width="0.4"/>
+  <rect x="32" y="142" width="7" height="28" rx="2"
+        fill="#0d0d14" stroke="#1a1a28" stroke-width="0.5"/>
+  <rect x="41" y="142" width="7" height="28" rx="2"
+        fill="#0d0d14" stroke="#1a1a28" stroke-width="0.5"/>
 
-  <!-- Red eye slit -->
-  <rect x="32" y="52" width="16" height="3" rx="1.5"
-        fill="#cc0000" filter="url(#eyeGlow)" opacity="0.92"/>
-  <!-- inner brighter slit -->
-  <rect x="34" y="52.8" width="12" height="1.4" rx="0.7"
-        fill="#ff2020" opacity="0.7"/>
+  <!-- Red eye slit with glow -->
+  <rect x="32" y="51" width="16" height="3.5" rx="1.75"
+        fill="#cc0000" filter="url(#eyeGlow)" opacity="0.95"/>
+  <!-- Brighter inner core of slit -->
+  <rect x="34" y="51.8" width="12" height="1.8" rx="0.9"
+        fill="#ff3030" opacity="0.65"/>
 </svg>
