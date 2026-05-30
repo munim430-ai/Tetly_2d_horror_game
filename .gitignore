@@ -10,3 +10,6 @@ playwright-mcp/
 # OS
 .DS_Store
 Thumbs.db
+
+# Playwright debug screenshots
+screenshot*.png
