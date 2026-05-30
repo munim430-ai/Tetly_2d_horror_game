@@ -1787,49 +1787,49 @@ function drawStartScreen() {
     ctx.fillRect(gx, gy, 1, 1);
   }
 
-  // Vignette
+  // Vignette — reduced opacity so edge text remains legible
   const grad = ctx.createRadialGradient(BASE_W / 2, BASE_H / 2, 100, BASE_W / 2, BASE_H / 2, BASE_W * 0.75);
   grad.addColorStop(0, 'rgba(0,0,0,0)');
-  grad.addColorStop(1, 'rgba(0,0,0,0.85)');
+  grad.addColorStop(1, 'rgba(0,0,0,0.60)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, BASE_W, BASE_H);
 
   // Title
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#cc3333';
+  ctx.fillStyle = '#dd4444';
   ctx.font = 'bold 42px serif';
   ctx.fillText('ECHOES OF', BASE_W / 2, BASE_H / 2 - 60);
-  ctx.fillStyle = '#aa2222';
+  ctx.fillStyle = '#cc3333';
   ctx.font = 'bold 50px serif';
   ctx.fillText('WARD 13', BASE_W / 2, BASE_H / 2 - 15);
-  ctx.fillStyle = '#554444';
+  ctx.fillStyle = '#998877';
   ctx.font = '13px monospace';
   ctx.fillText('A SURVIVAL HORROR EXPERIENCE', BASE_W / 2, BASE_H / 2 + 20);
-  ctx.fillStyle = '#445544';
+  ctx.fillStyle = '#778877';
   ctx.font = '11px monospace';
   ctx.fillText('Collect 3 keys. Reach the exit. Do not be caught.', BASE_W / 2, BASE_H / 2 + 48);
   const blink = Math.floor(frameCount / 30) % 2 === 0;
   if (blink) {
-    ctx.fillStyle = '#888';
+    ctx.fillStyle = '#cccccc';
     ctx.font = '13px monospace';
     ctx.fillText('PRESS ANY KEY OR TAP TO BEGIN', BASE_W / 2, BASE_H / 2 + 80);
   }
-  ctx.fillStyle = '#333';
+  ctx.fillStyle = '#666666';
   ctx.font = '9px monospace';
   ctx.fillText('ARROW KEYS / WASD: MOVE   F: FLASHLIGHT   H: HIDE   ESC: PAUSE', BASE_W / 2, BASE_H - 20);
   const saved = loadProgress();
   if (saved > 0) {
-    ctx.fillStyle = 'rgba(150,120,60,0.85)';
+    ctx.fillStyle = 'rgba(200,170,90,0.9)';
     ctx.font = '11px monospace';
     ctx.textAlign = 'center';
     ctx.fillText(`[ Saved progress: Ward ${saved + 1} ]`, BASE_W / 2, BASE_H - 36);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#666666';
     ctx.font = '10px monospace';
     ctx.textAlign = 'right';
     ctx.fillText('[L] LEVEL SELECT', BASE_W - 12, BASE_H - 14);
   }
-  ctx.fillStyle = '#333';
+  ctx.fillStyle = '#666666';
   ctx.font = '10px monospace';
   ctx.textAlign = 'left';
   ctx.fillText('[?] HOW TO PLAY', 12, BASE_H - 14);
