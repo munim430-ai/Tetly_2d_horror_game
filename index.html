@@ -179,6 +179,9 @@ const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 const BASE_W = 800, BASE_H = 450;
 let scale = 1, offX = 0, offY = 0;
+let BTN_W = 70, BTN_H = 70;
+let BTN_FLASH_X = BASE_W - 155, BTN_FLASH_Y = BASE_H - 85;
+let BTN_HIDE_X  = BASE_W - 80,  BTN_HIDE_Y  = BASE_H - 85;
 
 function resizeCanvas() {
   const wr = window.innerWidth / BASE_W;
@@ -308,9 +311,6 @@ function isInBtn(x, y, bx, by, bw, bh) {
   return x >= bx && x <= bx + bw && y >= by && y <= by + bh;
 }
 
-let BTN_W = 70, BTN_H = 70;
-let BTN_FLASH_X = BASE_W - 155, BTN_FLASH_Y = BASE_H - 85;
-let BTN_HIDE_X  = BASE_W - 80,  BTN_HIDE_Y  = BASE_H - 85;
 const JOY_CX = 80, JOY_CY = BASE_H - 80, JOY_R = 60;
 
 canvas.addEventListener('touchstart', e => {
