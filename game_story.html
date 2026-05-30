@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Echoes of Ward 13 — Story</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0a0808;
+      color: #e8e0d8;
+      font-family: 'Georgia', serif;
+      line-height: 1.8;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0,0,0,0.03) 2px,
+          rgba(0,0,0,0.03) 4px
+        );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .page-wrapper {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      padding: 60px 20px 40px;
+      border-bottom: 1px solid #2a0808;
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      display: block;
+      width: 200px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #8b0000, transparent);
+      margin: 30px auto 0;
+    }
+
+    .title-eyebrow {
+      font-family: monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.45em;
+      color: #8b0000;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    h1.game-title {
+      font-family: 'Georgia', serif;
+      font-size: clamp(2.4rem, 7vw, 4.2rem);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow:
+        0 0 18px rgba(139, 0, 0, 0.7),
+        0 0 40px rgba(139, 0, 0, 0.3),
+        2px 2px 0 #1a0000;
+      line-height: 1.1;
+    }
+
+    h1.game-title span {
+      color: #8b0000;
+    }
+
+    .tagline {
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 1rem;
+      letter-spacing: 0.3em;
+      color: #c0392b;
+      text-transform: uppercase;
+      font-style: italic;
+    }
+
+    /* ── SECTION HEADINGS ── */
+    h2.section-heading {
+      font-family: 'Georgia', serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #8b0000;
+      margin: 56px 0 20px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2a0808;
+      position: relative;
+    }
+
+    h2.section-heading::before {
+      content: '//';
+      font-family: monospace;
+      color: #3a0000;
+      margin-right: 12px;
+    }
+
+    h3.sub-heading {
+      font-family: 'Georgia', serif;
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c0392b;
+      margin: 28px 0 10px;
+    }
+
+    /* ── SYNOPSIS PARAGRAPHS ── */
+    .synopsis p {
+      margin-bottom: 1.4em;
+      color: #cec8c0;
+      font-size: 1.05rem;
+      text-align: justify;
+      text-indent: 2em;
+    }
+
+    .synopsis p:first-child::first-letter {
+      font-size: 3.4rem;
+      font-weight: 700;
+      color: #8b0000;
+      float: left;
+      line-height: 0.75;
+      margin: 6px 10px 0 0;
+      text-shadow: 0 0 12px rgba(139,0,0,0.6);
+    }
+
+    /* ── CHARACTERS ── */
+    .characters-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 560px) {
+      .characters-grid { grid-template-columns: 1fr; }
+    }
+
+    .character-card {
+      background: #0f0a0a;
+      border: 1px solid #2a0808;
+      border-left: 3px solid #8b0000;
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .character-card::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 60px; height: 60px;
+      background: radial-gradient(ellipse at top right, rgba(139,0,0,0.08), transparent);
+    }
+
+    .character-card h3 {
+      font-family: 'Georgia', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .character-card .role {
+      font-family: monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      color: #8b0000;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .character-card p {
+      font-size: 0.9rem;
+      color: #a09890;
+      line-height: 1.7;
+    }
+
+    /* ── MECHANICS ── */
+    .mechanics-list {
+      list-style: none;
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .mechanics-list { grid-template-columns: 1fr; }
+    }
+
+    .mechanics-list li {
+      background: #0f0a0a;
+      border: 1px solid #1e0808;
+      padding: 16px 18px;
+    }
+
+    .mechanics-list li .mechanic-name {
+      font-family: monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #8b0000;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .mechanics-list li p {
+      font-size: 0.88rem;
+      color: #a09890;
+      line-height: 1.6;
+    }
+
+    /* ── CLASSIFIED FILE ── */
+    .classified-file {
+      margin-top: 56px;
+      border: 1px solid #3a0a0a;
+      background: #080505;
+      padding: 30px 36px;
+      position: relative;
+    }
+
+    .classified-file::before {
+      content: 'CLASSIFIED';
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #8b0000;
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.5em;
+      padding: 3px 14px;
+      text-transform: uppercase;
+    }
+
+    .classified-file .file-header {
+      text-align: center;
+      border-bottom: 1px dashed #2a0808;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .classified-file .file-header h2 {
+      font-family: monospace;
+      font-size: 1.05rem;
+      letter-spacing: 0.25em;
+      color: #8b0000;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .classified-file .file-header .file-sub {
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: #5a2020;
+      letter-spacing: 0.2em;
+    }
+
+    .classified-file .file-body {
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: #8b0000;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+
+    .classified-file .file-body .field-label {
+      color: #5a2020;
+    }
+
+    .redacted {
+      background: #8b0000;
+      color: #8b0000;
+      user-select: none;
+      padding: 0 4px;
+    }
+
+    .redacted:hover {
+      background: transparent;
+      color: #c0392b;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 80px;
+      border-top: 1px solid #1e0808;
+      padding-top: 24px;
+      text-align: center;
+      font-family: monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      color: #3a1a1a;
+      text-transform: uppercase;
+    }
+
+    /* ── DECORATIVE DIVIDERS ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 48px 0 0;
+      opacity: 0.35;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #8b0000;
+    }
+
+    .divider span {
+      font-family: monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: #8b0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <!-- HEADER -->
+    <header>
+      <p class="title-eyebrow">University Game Project &mdash; 2025</p>
+      <h1 class="game-title">Echoes of <span>Ward 13</span></h1>
+      <p class="tagline">"The Dark Hears Your Heartbeat"</p>
+    </header>
+
+    <!-- SYNOPSIS -->
+    <h2 class="section-heading">Story Synopsis</h2>
+    <div class="synopsis">
+      <p>
+        You wake on a cold metal table. The surface is stainless steel — or it was, once. Now it is black with old rust and something darker. A single fluorescent tube flickers above you, strobing the room in white and shadow. You have no name. You have no memory. You have a pounding heartbeat and a heavy flashlight lying beside your hand. Pinned to your chest with a scalpel is a note, written in dried brown ink — or something very close to it. It reads: <em>"The Dark hears your heartbeat. Find the three keys before it finds you."</em> Somewhere deep in the building, a door slams. You are in Ward 13.
+      </p>
+      <p>
+        The hospital corridors are absolute darkness. What little your flashlight reveals are peeling walls, overturned gurneys, and the silent evidence of a place that was abandoned in tremendous haste. Charts still hang on doors. Trays of instruments lie mid-procedure. The PA system crackles on occasion — not with words, but with breathing. Your flashlight is your lifeline: it carves a cone of pale light from the black, lets you read the faded ward signs, lets you see what is ahead. But the battery is dying. The beam dims by degrees, and when it goes out entirely, you will be navigating entirely by memory and sound. The darkness is not merely an absence of light. It is a presence. It listens.
+      </p>
+      <p>
+        They call it The Patient. No one knows its name — the records that remain are mostly redacted, a clinical bureaucracy that apparently found it easier to black out entire case files than explain what Ward 13 housed. What you can observe: it is tall, well over seven feet, dressed in a hospital gown that trails along the floor. It has no eyes — only smooth, featureless skin stretched over a face that was never finished. It does not need eyes. It tracks by sound alone: the scuff of a shoe, the rattle of a medical cart brushed by a passing arm, the sharp intake of breath when a door creaks. It is patient — its name is not ironic — and it does not hurry. It simply follows. And it never stops.
+      </p>
+      <p>
+        Three keys. That is all that stands between you and the exit. The first is in the Examination Hall at the north end of the ground floor, locked inside a medication cabinet whose combination has been scratched into a bathroom stall three corridors away. The second is in the flooded basement, where the water is knee-deep and every step sends ripples of sound racing outward in the dark. The third is in the Director's Office on the third floor — the floor where The Patient was last seen. Each key you find brings you one step closer to the heavy iron door at the front of the building. Each key you find also takes time, and time is the one resource you cannot recover.
+      </p>
+      <p>
+        Escape before your light runs out. Escape before The Patient learns the rhythm of your heartbeat well enough to follow you anywhere. Escape before the fear calcifies into something permanent — before the flickering at the edge of your vision stops being a battery warning and starts being something your mind manufactures on its own. Ward 13 has had many patients. None of them left by the front door. You will be the first, or you will become one more echo in its walls.
+      </p>
+    </div>
+
+    <!-- CHARACTERS -->
+    <h2 class="section-heading">Characters</h2>
+    <div class="characters-grid">
+      <div class="character-card">
+        <h3>You</h3>
+        <div class="role">The Amnesiac &mdash; Playable</div>
+        <p>
+          Gender-neutral, identity unknown. Woke on Table 4 of the Ward 13 intake room with no memory prior to that moment. Physically capable but fragile. Carries one flashlight. Psychological state deteriorates the longer spent in darkness — the Fear System reflects an internal collapse that affects perception, movement, and sound sensitivity. Motivation is pure and primal: survive. Get out. Remember, if there is anything left to remember.
+        </p>
+      </div>
+      <div class="character-card">
+        <h3>The Patient</h3>
+        <div class="role">The Entity &mdash; Antagonist</div>
+        <p>
+          Former occupant of Ward 13, room number <span class="redacted">REDACTED</span>. Admitted <span class="redacted">REDACTED</span>. Diagnosis: <span class="redacted">REDACTED</span>. Now stands approximately 7'4", emaciated, expressionless. Blind — no ocular organs present. Tracks exclusively via auditory input, which is extraordinarily sensitive. Does not communicate. Does not stop. Case file sealed under Hospital Administration Order <span class="redacted">13-OMEGA</span>.
+        </p>
+      </div>
+    </div>
+
+    <!-- MECHANICS -->
+    <h2 class="section-heading">Core Mechanics</h2>
+    <ul class="mechanics-list">
+      <li>
+        <span class="mechanic-name">Flashlight</span>
+        <p>Your sole light source. Battery drains in real time. Lower battery means a narrower, dimmer cone. At critical levels the beam pulses and dies. Cannot be recharged — batteries can be found scattered through the ward, but they are rare.</p>
+      </li>
+      <li>
+        <span class="mechanic-name">Fear System</span>
+        <p>A meter reflecting sanity and composure. Rises when in darkness, when The Patient is near, or when scripted horror events trigger. At high fear, movement becomes erratic, breath becomes audible, and hallucinations appear. At maximum fear: game over.</p>
+      </li>
+      <li>
+        <span class="mechanic-name">Stealth &amp; Lockers</span>
+        <p>Make noise and The Patient investigates. Hold still and silence your movement. Lockers and large cabinets can be entered — hold breath inside to mute your presence entirely. Emerging too early draws immediate attention. The Patient remembers the last sound it heard.</p>
+      </li>
+      <li>
+        <span class="mechanic-name">Three Keys</span>
+        <p>Iron keys hidden across three distinct zones: Ground Floor (Examination Hall), Basement (Flooded Ward), Third Floor (Director's Office). Each is guarded by environmental hazards and increasingly frequent appearances of The Patient. All three are required to unlock the front exit.</p>
+      </li>
+    </ul>
+
+    <!-- CLASSIFIED FILE -->
+    <div class="classified-file">
+      <div class="file-header">
+        <h2>Classified Patient File #13</h2>
+        <div class="file-sub">Blackridge Psychiatric Institute &mdash; Internal Record &mdash; Do Not Distribute</div>
+      </div>
+      <div class="file-body"><span class="field-label">PATIENT ID        :</span> 13-WARD-OMEGA
+<span class="field-label">ADMISSION DATE    :</span> <span class="redacted">██████████</span>
+<span class="field-label">ADMITTING PHYSICIAN:</span> Dr. <span class="redacted">████████████</span>, M.D., Ph.D.
+<span class="field-label">WARD ASSIGNMENT   :</span> Ward 13, Room 13-B (Isolation)
+<span class="field-label">DIAGNOSIS         :</span> <span class="redacted">██████████████████████████████████████</span>
+
+<span class="field-label">INTAKE NOTES (Day 1):</span>
+Patient arrived via private ambulance. No personal effects.
+No next of kin on file. No prior medical history retrievable.
+Unresponsive to name. Height approximately 7 ft 2 in.
+Weight: <span class="redacted">████</span> lbs. Eyes: <span class="redacted">ANOMALOUS — SEE ATTACHED PHOTOGRAPH</span>.
+Patient did not react to fluorescent overhead lighting.
+Patient did react — strongly — to the sound of a clipboard
+dropping in the adjacent hallway. Response: immediate
+full-body orientation toward sound source. Duration: 4 min, 17 sec.
+Recommend auditory isolation protocol.
+
+<span class="field-label">PROGRESS NOTE (Week 3):</span>
+Auditory sensitivity has increased since admission.
+Patient can reportedly detect a whisper through two closed doors.
+Standard restraints ineffective — see Incident Report <span class="redacted">███-B</span>.
+Patient does not sleep. Monitoring equipment confirms 0 hours
+REM across all observed periods. Patient stands at room center
+for approximately 18–22 hours per day.
+Staff have been instructed not to drop objects near Ward 13.
+
+<span class="field-label">PROGRESS NOTE (Week 7):</span>
+<span class="redacted">████████████████████████████████████████████████████████████
+████████████████████████████████████████████████████████████</span>
+Patient now uncontained. Ward 13 sealed per Admin Order 13-OMEGA.
+All staff evacuated. Building marked for closure.
+Do NOT re-enter Ward 13.
+
+<span class="field-label">FINAL STATUS       :</span> UNRESOLVED. FILE SEALED.
+<span class="field-label">SIGNED             :</span> Hospital Administrator <span class="redacted">████████████</span>
+<span class="field-label">DATE               :</span> <span class="redacted">██████████</span>
+
+NOTE: Hovering over redacted text may reveal contents.
+      All personnel with knowledge of Patient #13 are reminded
+      of their non-disclosure obligations under Clause <span class="redacted">13-OMEGA</span>.</div>
+    </div>
+
+    <div class="divider"><span>&#x2020; end of document &#x2020;</span></div>
+
+    <footer>
+      &copy; 2025 Ward 13 Productions &mdash; University Game Project &mdash; All rights reserved
+    </footer>
+
+  </div>
+</body>
+</html>
