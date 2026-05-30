@@ -1,5 +1,11 @@
 {
   "mcpServers": {
+    "playwright": {
+      "command": "node",
+      "args": [
+        "/home/user/Tetly_2d_horror_game/playwright-mcp/cli.js"
+      ]
+    },
     "claude-flow": {
       "command": "npx",
       "args": [
