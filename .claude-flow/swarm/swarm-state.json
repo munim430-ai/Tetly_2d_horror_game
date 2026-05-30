@@ -4,8 +4,10 @@
       "swarmId": "swarm-1780163605920-oflufa",
       "topology": "hierarchical",
       "maxAgents": 3,
-      "status": "running",
-      "agents": [],
+      "status": "terminated",
+      "agents": [
+        "senior-reviewer"
+      ],
       "tasks": [],
       "config": {
         "topology": "hierarchical",
@@ -16,8 +18,9 @@
         "consensusMechanism": "majority"
       },
       "createdAt": "2026-05-30T17:53:25.920Z",
-      "updatedAt": "2026-05-30T17:53:25.920Z",
-      "pid": 1434
+      "updatedAt": "2026-05-30T22:42:28.158Z",
+      "pid": 1434,
+      "terminationReason": "host process 1434 exited"
     }
   },
   "version": "3.0.0"
