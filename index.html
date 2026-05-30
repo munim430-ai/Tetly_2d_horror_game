@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#cc2222">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ward 13">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
+<meta name="description" content="Echoes of Ward 13 — 5-ward HTML5 survival horror. Collect keys, avoid The Patient, escape.">
+<meta property="og:title" content="Echoes of Ward 13">
+<meta property="og:description" content="5-ward HTML5 survival horror. Collect keys, avoid The Patient, escape.">
+<meta property="og:type" content="website">
 <title>Echoes of Ward 13</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -2329,6 +2339,15 @@ function renderGame() {
 
 // Kick off
 requestAnimationFrame(gameLoop);
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.warn('SW failed:', e));
+  });
+}
 </script>
 </body>
 </html>
