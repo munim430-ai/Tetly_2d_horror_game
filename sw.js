@@ -1,6 +1,5 @@
 const CACHE = 'ward13-v1';
 const ASSETS = [
-  './',
   './index.html',
   './manifest.json',
   './icons/icon-192.svg',

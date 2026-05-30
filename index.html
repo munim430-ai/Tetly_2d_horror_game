@@ -35,6 +35,9 @@ let audioReady = false;
 function initAudio() {
   if (audioReady) return;
   try {
+    if (ambienceNode) { try { ambienceNode.stop(); } catch(e) {} ambienceNode = null; }
+    if (chaseOsc)  { try { chaseOsc.stop();  } catch(e) {} chaseOsc  = null; }
+    if (chaseOsc2) { try { chaseOsc2.stop(); } catch(e) {} chaseOsc2 = null; }
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     ambienceGain = audioCtx.createGain();
     ambienceGain.gain.value = 0.15;
@@ -70,11 +73,12 @@ function updateChaseMusic() {
   const hunting = (entity.state === 'hunt') || (entity2 && entity2.state === 'hunt');
   const allKeys = player.keysCollected >= 3;
   const targetGain = player.hiding ? 0 : hunting ? (allKeys ? 0.22 : 0.14) : 0;
+  const now = audioCtx.currentTime;
   const current = chaseGain.gain.value;
-  // Smooth ramp: attack fast, release slow
-  const rate = targetGain > current ? 0.04 : 0.012;
-  chaseGain.gain.value = current + (targetGain - current) * rate;
-  // Modulate frequency slightly for pulse effect
+  const rampTime = targetGain > current ? 0.05 : 0.3;
+  chaseGain.gain.cancelScheduledValues(now);
+  chaseGain.gain.setValueAtTime(current, now);
+  chaseGain.gain.linearRampToValueAtTime(targetGain, now + rampTime);
   if (chaseOsc) chaseOsc.frequency.value = 55 + Math.sin(Date.now() * 0.003) * 4;
   if (chaseOsc2) chaseOsc2.frequency.value = 58 + Math.cos(Date.now() * 0.0025) * 3;
 }
@@ -184,10 +188,14 @@ function resizeCanvas() {
   const wr = window.innerWidth / BASE_W;
   const hr = window.innerHeight / BASE_H;
   scale = Math.min(wr, hr);
-  canvas.width = BASE_W;
-  canvas.height = BASE_H;
-  canvas.style.width = (BASE_W * scale) + 'px';
-  canvas.style.height = (BASE_H * scale) + 'px';
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = Math.round(BASE_W * scale);
+  const cssH = Math.round(BASE_H * scale);
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  ctx.scale(scale * dpr, scale * dpr);
   // Ensure touch buttons are at least 48 physical px
   BTN_W = BTN_H = Math.max(70, Math.ceil(48 / scale));
   BTN_FLASH_X = BASE_W - BTN_W * 2 - 15;
@@ -614,8 +622,7 @@ let player = {};
 function resetPlayer() {
   player = {
     x: 80, y: GROUND_Y - PLAYER_H,
-    vx: 0, vy: 0,
-    onGround: true,
+    vx: 0,
     speed: 2.5,
     runSpeed: 2.5,
     flashlight: true,
@@ -709,12 +716,6 @@ function updatePlayer(dt) {
     player.fear = Math.max(0, player.fear - 0.015 * (dt / 16.67));
   }
 
-  // Passive fear decay when flashlight on and entity is distant
-  const entityDist2 = Math.abs(entity.x - player.x);
-  if (player.flashlight && entityDist2 > 500 && !player.hiding) {
-    player.fear = Math.max(0, player.fear - 0.015 * (dt / 16.67));
-  }
-
   // Fear screen shake
   if (player.fear > 80) {
     player.shakeX = (Math.random() - 0.5) * 4 * ((player.fear - 80) / 20);
@@ -725,7 +726,6 @@ function updatePlayer(dt) {
 
   // Footsteps
   if (moving) {
-    frameCount++;
     if (frameCount - lastFootstep > 20) {
       playFootstep();
       lastFootstep = frameCount;
@@ -1779,13 +1779,7 @@ function drawStartScreen() {
   ctx.fillStyle = '#0a0a0f';
   ctx.fillRect(0, 0, BASE_W, BASE_H);
 
-  // Film grain on start
-  for (let i = 0; i < BASE_W * BASE_H / 30; i++) {
-    const gx = Math.random() * BASE_W;
-    const gy = Math.random() * BASE_H;
-    ctx.fillStyle = `rgba(${Math.floor(Math.random() * 30)}, ${Math.floor(Math.random() * 30)}, ${Math.floor(Math.random() * 30)}, 0.4)`;
-    ctx.fillRect(gx, gy, 1, 1);
-  }
+  applyFilmGrain();
 
   // Vignette
   const grad = ctx.createRadialGradient(BASE_W / 2, BASE_H / 2, 100, BASE_W / 2, BASE_H / 2, BASE_W * 0.75);
@@ -2113,7 +2107,7 @@ function saveProgress(level) {
   try { localStorage.setItem('ward13_level', level); } catch(e) {}
 }
 function loadProgress() {
-  try { return parseInt(localStorage.getItem('ward13_level') || '0', 10); } catch(e) { return 0; }
+  try { const n = parseInt(localStorage.getItem('ward13_level') || '0', 10); return isNaN(n) ? 0 : n; } catch(e) { return 0; }
 }
 function saveMaxLevel(level) {
   try {
@@ -2122,7 +2116,7 @@ function saveMaxLevel(level) {
   } catch(e) {}
 }
 function loadMaxLevel() {
-  try { return parseInt(localStorage.getItem('ward13_max') || '0', 10); } catch(e) { return 0; }
+  try { const n = parseInt(localStorage.getItem('ward13_max') || '0', 10); return isNaN(n) ? 0 : n; } catch(e) { return 0; }
 }
 
 // ==================== GAME INIT ====================
@@ -2344,7 +2338,6 @@ requestAnimationFrame(gameLoop);
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
-      .then(r => console.log('SW registered:', r.scope))
       .catch(e => console.warn('SW failed:', e));
   });
 }
