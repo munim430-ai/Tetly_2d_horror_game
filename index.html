@@ -225,6 +225,12 @@ window.addEventListener('keydown', e => {
     if (state === 'playing') { state = 'paused'; return; }
     if (state === 'paused')  { state = 'playing'; return; }
   }
+  if (state === 'credits') {
+    if (e.key === 'Escape') { state = 'start'; return; }
+  }
+  if ((e.key === 'c' || e.key === 'C') && (state === 'start' || state === 'paused')) {
+    state = 'credits'; return;
+  }
   if (state === 'paused') {
     if (e.key === 'r' || e.key === 'R') { state = 'playing'; return; }
     if (e.key === 'n' || e.key === 'N') { loadLevel(currentLevel); resetPlayer(); resetEntity(); camera.x = 0; frameCount = 0; state = 'playing'; return; }
@@ -2008,6 +2014,69 @@ function drawLevelSelect() {
   ctx.restore();
 }
 
+function drawCredits() {
+  ctx.save();
+  ctx.fillStyle = '#06060a';
+  ctx.fillRect(0, 0, BASE_W, BASE_H);
+  applyFilmGrain();
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#cc2222';
+  ctx.font = 'bold 18px serif';
+  ctx.fillText('ECHOES OF WARD 13', BASE_W/2, 40);
+  ctx.fillStyle = '#554444';
+  ctx.font = '11px monospace';
+  ctx.fillText('A 5-WARD SURVIVAL HORROR EXPERIENCE', BASE_W/2, 60);
+
+  const lines = [
+    ['DESIGN & DEVELOPMENT', ''],
+    ['Game Design', 'Ward 13 Project'],
+    ['Programming', 'HTML5 Canvas + Web Audio API'],
+    ['Art Direction', 'Procedural Silhouette Aesthetic'],
+    ['Sound Design', 'Web Audio API Synthesis'],
+    ['', ''],
+    ['TECHNOLOGY', ''],
+    ['Engine', 'Vanilla JavaScript — No frameworks'],
+    ['Audio', 'Web Audio API'],
+    ['Renderer', 'HTML5 Canvas 2D'],
+    ['Platform', 'Browser / Mobile / Capacitor APK'],
+    ['', ''],
+    ['INSPIRED BY', ''],
+    ['Lone Survivor', 'Darkwood  ·  Limbo  ·  The Coma'],
+    ['', ''],
+    ['Thank you for playing.', ''],
+  ];
+
+  let y = 92;
+  for (const [left, right] of lines) {
+    if (!left && !right) { y += 8; continue; }
+    if (!right) {
+      ctx.fillStyle = '#882222';
+      ctx.font = 'bold 9px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(left.toUpperCase(), BASE_W/2, y);
+    } else {
+      ctx.fillStyle = '#888880';
+      ctx.font = '9px monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(left, BASE_W/2 - 8, y);
+      ctx.fillStyle = '#c0b8a0';
+      ctx.textAlign = 'left';
+      ctx.fillText(right, BASE_W/2 + 8, y);
+    }
+    y += 16;
+  }
+
+  const blink = Math.floor(frameCount / 30) % 2 === 0;
+  if (blink) {
+    ctx.fillStyle = '#555';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('ESC TO RETURN', BASE_W/2, BASE_H - 14);
+  }
+  ctx.restore();
+}
+
 // ==================== PAUSE MENU ====================
 function drawPauseMenu() {
   ctx.save();
@@ -2022,9 +2091,10 @@ function drawPauseMenu() {
   ctx.fillText('[R]  Resume', BASE_W / 2, BASE_H / 2 - 20);
   ctx.fillText('[N]  Restart Level', BASE_W / 2, BASE_H / 2 + 10);
   ctx.fillText('[M]  Main Menu', BASE_W / 2, BASE_H / 2 + 40);
+  ctx.fillText('[C]  Credits', BASE_W / 2, BASE_H / 2 + 70);
   ctx.fillStyle = '#555';
   ctx.font = '10px monospace';
-  ctx.fillText('ESC to resume', BASE_W / 2, BASE_H / 2 + 74);
+  ctx.fillText('ESC to resume', BASE_W / 2, BASE_H / 2 + 100);
   ctx.restore();
 }
 
@@ -2159,6 +2229,14 @@ function gameLoop(ts) {
   if (state === 'levelSelect') {
     ctx.save();
     drawLevelSelect();
+    ctx.restore();
+    ctx.restore();
+    return;
+  }
+
+  if (state === 'credits') {
+    ctx.save();
+    drawCredits();
     ctx.restore();
     ctx.restore();
     return;
