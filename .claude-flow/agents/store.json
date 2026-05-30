@@ -1,0 +1,19 @@
+{
+  "agents": {
+    "game-auditor": {
+      "agentId": "game-auditor",
+      "agentType": "reviewer",
+      "status": "idle",
+      "health": 1,
+      "taskCount": 0,
+      "config": {
+        "model": "sonnet"
+      },
+      "createdAt": "2026-05-30T17:44:53.492Z",
+      "domain": "game-review",
+      "model": "sonnet",
+      "modelRoutedBy": "explicit"
+    }
+  },
+  "version": "3.0.0"
+}

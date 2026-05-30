@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <defs>
+    <!-- Gold drop-shadow glow: 0 0 4px #ffd700 -->
+    <filter id="goldGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2"
+                    flood-color="#ffd700" flood-opacity="0.80"/>
+    </filter>
+  </defs>
+
+  <!-- Dark background -->
+  <rect width="40" height="40" fill="#0a0a0f"/>
+
+  <!-- Entire key with gold glow applied -->
+  <g filter="url(#goldGlow)">
+    <!-- Key head circle: centered at (13,18), r=8 -->
+    <circle cx="13" cy="18" r="8" fill="#d4a017"/>
+
+    <!-- Key hole punch-through -->
+    <circle cx="13" cy="18" r="3.5" fill="#0a0a0f"/>
+
+    <!-- Key shaft: 3px tall x 16px wide, extending right from head -->
+    <rect x="19" y="16.5" width="16" height="3" rx="1" fill="#d4a017"/>
+
+    <!-- Tooth 1: 4x5px nub, near shaft end -->
+    <rect x="28" y="19.5" width="4" height="5" rx="1" fill="#d4a017"/>
+
+    <!-- Tooth 2: 3x4px nub, slightly inboard -->
+    <rect x="23" y="19.5" width="3" height="4" rx="1" fill="#d4a017"/>
+  </g>
+</svg>

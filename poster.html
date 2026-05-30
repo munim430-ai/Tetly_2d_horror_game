@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Echoes of Ward 13 — Official Poster</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background: #111;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Georgia', serif;
+      padding: 40px 20px;
+    }
+
+    /* ── POSTER FRAME ── */
+    .poster {
+      width: 800px;
+      height: 1100px;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      flex-shrink: 0;
+      box-shadow:
+        0 0 0 1px #1a0000,
+        0 0 60px rgba(139,0,0,0.35),
+        0 0 120px rgba(139,0,0,0.12);
+    }
+
+    /* Red gradient at bottom */
+    .poster::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 380px;
+      background: linear-gradient(0deg, rgba(80,0,0,0.7) 0%, rgba(40,0,0,0.4) 40%, transparent 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ── CORRIDOR SVG ── */
+    .corridor-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* ── FLICKER ANIMATION ── */
+    @keyframes flicker {
+      0%   { opacity: 1; }
+      4%   { opacity: 0.7; }
+      8%   { opacity: 1; }
+      15%  { opacity: 1; }
+      17%  { opacity: 0.4; }
+      19%  { opacity: 1; }
+      40%  { opacity: 1; }
+      41%  { opacity: 0.6; }
+      43%  { opacity: 1; }
+      75%  { opacity: 1; }
+      76%  { opacity: 0.5; }
+      77%  { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes flickerGlow {
+      0%   { opacity: 0.6; }
+      4%   { opacity: 0.2; }
+      8%   { opacity: 0.6; }
+      15%  { opacity: 0.6; }
+      17%  { opacity: 0.1; }
+      19%  { opacity: 0.6; }
+      40%  { opacity: 0.6; }
+      41%  { opacity: 0.3; }
+      43%  { opacity: 0.6; }
+      75%  { opacity: 0.6; }
+      76%  { opacity: 0.15; }
+      77%  { opacity: 0.6; }
+      100% { opacity: 0.6; }
+    }
+
+    .flicker-light {
+      animation: flicker 4s infinite;
+    }
+
+    .flicker-glow {
+      animation: flickerGlow 4s infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.82; transform: scaleX(1) scaleY(1); }
+      50%       { opacity: 0.95; transform: scaleX(1.003) scaleY(1.002); }
+    }
+
+    .figure-silhouette {
+      animation: breathe 5s ease-in-out infinite;
+      transform-origin: 400px 600px;
+    }
+
+    /* ── POSTER CONTENT LAYER ── */
+    .poster-content {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    /* ── TOP RATING STRIP ── */
+    .rating-strip {
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      font-family: monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      z-index: 15;
+    }
+
+    /* ── PRODUCTION BADGE ── */
+    .prod-badge {
+      position: absolute;
+      top: 22px;
+      left: 24px;
+      font-family: monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      color: rgba(180,0,0,0.7);
+      text-transform: uppercase;
+      z-index: 15;
+      border: 1px solid rgba(139,0,0,0.3);
+      padding: 4px 10px;
+    }
+
+    /* ── TITLE BLOCK ── */
+    .title-block {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      z-index: 15;
+      padding: 0 30px;
+    }
+
+    .title-eyebrow {
+      font-family: monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.55em;
+      color: rgba(139,0,0,0.9);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .main-title {
+      font-family: 'Georgia', serif;
+      font-size: 4.6rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 0.95;
+      text-shadow:
+        0 0 8px rgba(139,0,0,1),
+        0 0 20px rgba(139,0,0,0.8),
+        0 0 50px rgba(139,0,0,0.5),
+        0 0 100px rgba(139,0,0,0.25),
+        3px 3px 0 #1a0000,
+        -1px -1px 0 #3a0000;
+    }
+
+    .main-title .ward-num {
+      color: #cc1010;
+      text-shadow:
+        0 0 8px rgba(200,0,0,1),
+        0 0 25px rgba(180,0,0,0.7),
+        0 0 60px rgba(139,0,0,0.4),
+        3px 3px 0 #1a0000;
+    }
+
+    /* ── BOTTOM SECTION ── */
+    .bottom-section {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 40px 0;
+    }
+
+    .tagline {
+      font-family: monospace;
+      font-size: 0.88rem;
+      letter-spacing: 0.48em;
+      text-transform: uppercase;
+      color: rgba(220,80,80,0.9);
+      text-align: center;
+      margin-bottom: 22px;
+      text-shadow: 0 0 12px rgba(139,0,0,0.6);
+    }
+
+    /* ── ICONS ROW ── */
+    .icons-row {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin-bottom: 20px;
+    }
+
+    .icon-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .icon-caption {
+      font-family: monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      color: rgba(180,60,60,0.7);
+      text-transform: uppercase;
+    }
+
+    /* ── CREDITS BAR ── */
+    .credits-bar {
+      width: 100%;
+      background: rgba(0,0,0,0.88);
+      border-top: 1px solid rgba(139,0,0,0.4);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .credits-text {
+      font-family: monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      color: rgba(160,100,100,0.8);
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .credits-text .sep {
+      color: rgba(139,0,0,0.7);
+      margin: 0 12px;
+    }
+
+    .credits-text .rated {
+      color: rgba(220,60,60,0.9);
+      border: 1px solid rgba(220,60,60,0.5);
+      padding: 1px 6px;
+      margin: 0 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="poster">
+
+    <!-- ── CORRIDOR SVG ── -->
+    <svg class="corridor-svg" viewBox="0 0 800 1100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <defs>
+        <!-- Vanishing point light glow -->
+        <radialGradient id="vpGlow" cx="50%" cy="38%" r="22%" fx="50%" fy="38%">
+          <stop offset="0%"   stop-color="#fff8e0" stop-opacity="0.55"/>
+          <stop offset="30%"  stop-color="#ffe0a0" stop-opacity="0.22"/>
+          <stop offset="60%"  stop-color="#cc4400" stop-opacity="0.09"/>
+          <stop offset="100%" stop-color="#000"    stop-opacity="0"/>
+        </radialGradient>
+
+        <!-- Ambient red glow bottom -->
+        <radialGradient id="redAmbient" cx="50%" cy="95%" r="60%">
+          <stop offset="0%"   stop-color="#660000" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#000"    stop-opacity="0"/>
+        </radialGradient>
+
+        <!-- Figure shadow gradient -->
+        <linearGradient id="figureGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#050202" stop-opacity="0.98"/>
+          <stop offset="85%" stop-color="#000"    stop-opacity="1"/>
+          <stop offset="100%" stop-color="#0a0000" stop-opacity="1"/>
+        </linearGradient>
+
+        <!-- Wall texture gradient left -->
+        <linearGradient id="wallLeft" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#080303" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#0e0505" stop-opacity="1"/>
+        </linearGradient>
+
+        <!-- Wall texture gradient right -->
+        <linearGradient id="wallRight" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#0e0505" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#080303" stop-opacity="1"/>
+        </linearGradient>
+
+        <!-- Floor gradient -->
+        <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#0a0404"/>
+          <stop offset="100%" stop-color="#050101"/>
+        </linearGradient>
+
+        <!-- Ceiling gradient -->
+        <linearGradient id="ceilGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#030101"/>
+          <stop offset="100%" stop-color="#080303"/>
+        </linearGradient>
+
+        <!-- Filter for light bloom -->
+        <filter id="bloom" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+
+        <!-- Figure blur edge -->
+        <filter id="figureBlur">
+          <feGaussianBlur stdDeviation="1.5"/>
+        </filter>
+
+        <!-- Glow filter -->
+        <filter id="lightGlow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="14" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE BLACK -->
+      <rect width="800" height="1100" fill="#000"/>
+
+      <!-- ── CORRIDOR GEOMETRY ── -->
+      <!-- Vanishing point: 400, 420 -->
+
+      <!-- CEILING panel -->
+      <polygon points="0,0 800,0 560,420 240,420" fill="url(#ceilGrad)"/>
+
+      <!-- FLOOR panel -->
+      <polygon points="0,1100 800,1100 560,420 240,420" fill="url(#floorGrad)"/>
+
+      <!-- LEFT WALL -->
+      <polygon points="0,0 240,420 240,680 0,1100" fill="url(#wallLeft)"/>
+
+      <!-- RIGHT WALL -->
+      <polygon points="800,0 560,420 560,680 800,1100" fill="url(#wallRight)"/>
+
+      <!-- ── WALL DETAILS — LEFT SIDE ── -->
+      <!-- Door frames left — receding -->
+      <!-- Door 1 (nearest) -->
+      <polygon points="30,80 100,80 105,420 35,420" fill="none" stroke="#1a0808" stroke-width="1.5" opacity="0.6"/>
+      <polygon points="30,80 100,80 105,310 35,310" fill="#060202" opacity="0.9"/>
+
+      <!-- Door 2 (mid) -->
+      <polygon points="120,140 168,140 171,420 122,420" fill="none" stroke="#150606" stroke-width="1" opacity="0.5"/>
+      <polygon points="120,140 168,140 171,360 122,360" fill="#050101" opacity="0.8"/>
+
+      <!-- Door 3 (distant) -->
+      <polygon points="178,210 205,210 207,420 179,420" fill="none" stroke="#100404" stroke-width="0.8" opacity="0.4"/>
+
+      <!-- Wall paneling lines LEFT -->
+      <line x1="0" y1="320" x2="240" y2="420" stroke="#110505" stroke-width="1.2" opacity="0.5"/>
+      <line x1="0" y1="440" x2="240" y2="460" stroke="#110505" stroke-width="1" opacity="0.4"/>
+      <line x1="0" y1="560" x2="240" y2="520" stroke="#110505" stroke-width="1" opacity="0.4"/>
+      <line x1="0" y1="680" x2="240" y2="580" stroke="#110505" stroke-width="1" opacity="0.3"/>
+      <line x1="0" y1="800" x2="240" y2="640" stroke="#0e0404" stroke-width="0.8" opacity="0.3"/>
+
+      <!-- ── WALL DETAILS — RIGHT SIDE ── -->
+      <!-- Door 1 (nearest) -->
+      <polygon points="700,80 770,80 765,420 695,420" fill="none" stroke="#1a0808" stroke-width="1.5" opacity="0.6"/>
+      <polygon points="700,80 770,80 765,310 695,310" fill="#060202" opacity="0.9"/>
+
+      <!-- Door 2 (mid) -->
+      <polygon points="632,140 680,140 678,420 629,420" fill="none" stroke="#150606" stroke-width="1" opacity="0.5"/>
+      <polygon points="632,140 680,140 678,360 629,360" fill="#050101" opacity="0.8"/>
+
+      <!-- Door 3 (distant) -->
+      <polygon points="595,210 622,210 621,420 593,420" fill="none" stroke="#100404" stroke-width="0.8" opacity="0.4"/>
+
+      <!-- Wall paneling lines RIGHT -->
+      <line x1="800" y1="320" x2="560" y2="420" stroke="#110505" stroke-width="1.2" opacity="0.5"/>
+      <line x1="800" y1="440" x2="560" y2="460" stroke="#110505" stroke-width="1" opacity="0.4"/>
+      <line x1="800" y1="560" x2="560" y2="520" stroke="#110505" stroke-width="1" opacity="0.4"/>
+      <line x1="800" y1="680" x2="560" y2="580" stroke="#110505" stroke-width="1" opacity="0.3"/>
+      <line x1="800" y1="800" x2="560" y2="640" stroke="#0e0404" stroke-width="0.8" opacity="0.3"/>
+
+      <!-- ── CEILING DETAILS — LIGHT FIXTURES ── -->
+      <!-- Light fixture 1 (nearest, large) -->
+      <polygon points="320,0 480,0 455,420 345,420" fill="#0a0303" opacity="0.4"/>
+      <rect x="330" y="15" width="140" height="12" rx="2" fill="#1a0a0a" opacity="0.8"/>
+      <!-- fixture glow near -->
+      <line x1="400" y1="0" x2="400" y2="420" stroke="#ffe8c0" stroke-width="0.5" opacity="0.08"/>
+
+      <!-- Light fixture 2 (mid) -->
+      <rect x="366" y="8" width="68" height="6" rx="1" fill="#2a1010" opacity="0.7"/>
+
+      <!-- ── CEILING FIXTURE LIGHTS ── -->
+      <!-- Far light at vanishing point — FLICKERING -->
+      <g class="flicker-light">
+        <ellipse cx="400" cy="420" rx="10" ry="4" fill="#fff8e0" opacity="0.9" filter="url(#bloom)"/>
+        <rect x="394" y="408" width="12" height="6" rx="1" fill="#fffde0" opacity="0.8"/>
+      </g>
+
+      <!-- Vanishing point glow atmosphere -->
+      <g class="flicker-glow">
+        <rect x="0" y="0" width="800" height="1100" fill="url(#vpGlow)"/>
+      </g>
+
+      <!-- Near fixture (dim, amber dying) -->
+      <rect x="340" y="12" width="120" height="8" rx="2" fill="#402010" opacity="0.5"/>
+      <ellipse cx="400" cy="16" rx="55" ry="10" fill="#ffcc80" opacity="0.08"/>
+
+      <!-- Ceiling crack lines -->
+      <path d="M370,0 Q380,80 362,150 Q348,220 355,280" stroke="#0d0404" stroke-width="1" fill="none" opacity="0.6"/>
+      <path d="M430,0 Q425,60 440,130 Q452,200 445,270" stroke="#0d0404" stroke-width="0.8" fill="none" opacity="0.5"/>
+
+      <!-- ── FLOOR DETAILS ── -->
+      <!-- Tile lines floor -->
+      <line x1="240" y1="680" x2="560" y2="680" stroke="#110404" stroke-width="0.8" opacity="0.5"/>
+      <line x1="160" y1="800" x2="640" y2="800" stroke="#0d0303" stroke-width="0.8" opacity="0.4"/>
+      <line x1="80"  y1="950" x2="720" y2="950" stroke="#0a0202" stroke-width="0.8" opacity="0.3"/>
+      <!-- lengthwise floor tiles -->
+      <line x1="400" y1="420" x2="240" y2="1100" stroke="#130505" stroke-width="0.8" opacity="0.3"/>
+      <line x1="400" y1="420" x2="340" y2="1100" stroke="#130505" stroke-width="0.6" opacity="0.25"/>
+      <line x1="400" y1="420" x2="460" y2="1100" stroke="#130505" stroke-width="0.6" opacity="0.25"/>
+      <line x1="400" y1="420" x2="560" y2="1100" stroke="#130505" stroke-width="0.8" opacity="0.3"/>
+      <!-- blood/stain on floor -->
+      <ellipse cx="310" cy="750" rx="28" ry="8" fill="#1a0000" opacity="0.6"/>
+      <ellipse cx="295" cy="765" rx="12" ry="4" fill="#1a0000" opacity="0.4"/>
+      <ellipse cx="480" cy="820" rx="18" ry="5" fill="#150000" opacity="0.5"/>
+
+      <!-- ── GURNEY (left side, mid-distance) ── -->
+      <g opacity="0.45">
+        <rect x="55" y="390" width="65" height="28" rx="2" fill="#0c0303"/>
+        <rect x="63" y="418" width="4" height="18" fill="#0a0202"/>
+        <rect x="108" y="418" width="4" height="18" fill="#0a0202"/>
+        <rect x="55" y="388" width="65" height="6" rx="1" fill="#0f0404"/>
+      </g>
+
+      <!-- ── WHEELCHAIR (right side, mid) ── -->
+      <g opacity="0.35">
+        <circle cx="685" cy="445" r="15" fill="none" stroke="#0e0404" stroke-width="2"/>
+        <circle cx="700" cy="445" r="8"  fill="none" stroke="#0c0303" stroke-width="1.5"/>
+        <rect x="675" y="410" width="30" height="20" rx="2" fill="none" stroke="#0e0404" stroke-width="1.5"/>
+        <line x1="683" y1="430" x2="677" y2="448" stroke="#0c0303" stroke-width="1.5"/>
+      </g>
+
+      <!-- ── THE PATIENT SILHOUETTE ── -->
+      <!-- Positioned at mid-distance in corridor (centred slightly left of VP) -->
+      <g class="figure-silhouette" filter="url(#figureBlur)">
+        <!-- body -->
+        <path d="
+          M 378,490
+          C 374,488 368,486 366,482
+          C 362,476 363,468 365,462
+          C 368,454 372,450 376,446
+          C 378,443 380,440 382,437
+          C 384,434 383,431 382,428
+          C 381,425 380,422 380,418
+          C 380,414 381,410 383,407
+          C 386,402 390,399 393,397
+          C 396,395 399,394 402,394
+          C 405,394 408,395 411,397
+          C 414,399 417,402 419,407
+          C 421,411 421,415 421,419
+          C 421,423 420,426 419,429
+          C 418,432 417,435 419,438
+          C 421,441 423,444 425,447
+          C 428,451 432,455 434,462
+          C 436,468 436,476 432,482
+          C 430,487 424,489 422,491
+          C 418,494 414,497 410,502
+          C 408,505 406,509 405,514
+          C 404,520 404,528 404,538
+          L 404,620
+          C 404,628 405,636 406,644
+          C 408,656 411,666 412,676
+          C 413,686 413,696 412,706
+          C 411,716 409,726 408,736
+          C 407,744 406,750 406,756
+          L 406,790
+          C 406,800 407,810 407,818
+          L 407,860
+
+          L 408,860
+          L 408,818
+          C 408,810 409,800 409,790
+          L 409,756
+          C 409,750 408,744 407,736
+          C 406,726 404,716 403,706
+          C 402,696 402,686 403,676
+          C 404,666 407,656 409,644
+          C 410,636 411,628 411,620
+          L 411,538
+          C 411,528 411,520 410,514
+          C 409,509 407,505 405,502
+          C 401,497 397,494 393,491
+
+          Z
+        " fill="url(#figureGrad)" opacity="0.95"/>
+
+        <!-- Head (featureless oval, slightly elongated) -->
+        <ellipse cx="401" cy="388" rx="22" ry="27" fill="#030101" opacity="0.98"/>
+
+        <!-- Gown trailing bottom -->
+        <path d="
+          M 388,720 C 382,740 376,760 372,790 C 368,820 366,850 365,880
+          L 436,880 C 434,850 432,820 428,790 C 424,760 418,740 412,720
+          Z
+        " fill="#020101" opacity="0.9"/>
+
+        <!-- Arms — unnaturally long, dangling -->
+        <!-- Left arm -->
+        <path d="
+          M 370,500 C 362,520 354,545 348,572 C 342,598 338,624 336,648
+          C 334,660 334,668 335,672 C 336,676 338,677 340,675
+          C 342,673 342,668 342,660 C 342,640 344,618 348,596
+          C 352,572 358,548 366,524 Z
+        " fill="#030101" opacity="0.9"/>
+
+        <!-- Right arm -->
+        <path d="
+          M 430,500 C 438,520 446,545 452,572 C 458,598 462,624 464,648
+          C 466,660 466,668 465,672 C 464,676 462,677 460,675
+          C 458,673 458,668 458,660 C 458,640 456,618 452,596
+          C 448,572 442,548 434,524 Z
+        " fill="#030101" opacity="0.9"/>
+
+        <!-- Subtle figure edge highlight (eerie rim-light from vanishing point) -->
+        <path d="
+          M 403,362 C 420,363 432,372 437,385 C 442,398 440,414 436,425
+          C 432,434 426,441 427,448 C 429,454 434,460 435,468
+          C 437,478 434,488 428,494
+        " fill="none" stroke="rgba(180,60,0,0.12)" stroke-width="1.5"/>
+      </g>
+
+      <!-- Shadow of figure cast on floor -->
+      <ellipse cx="400" cy="870" rx="35" ry="9" fill="#000" opacity="0.85"/>
+      <polygon points="375,870 425,870 420,1100 380,1100" fill="#000" opacity="0.5"/>
+
+      <!-- ── ATMOSPHERIC OVERLAYS ── -->
+      <!-- Dark vignette edges -->
+      <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+        <stop offset="0%"   stop-color="#000" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#000" stop-opacity="0.85"/>
+      </radialGradient>
+      <rect width="800" height="1100" fill="url(#vignette)"/>
+
+      <!-- Red ambient bottom -->
+      <rect width="800" height="1100" fill="url(#redAmbient)"/>
+
+      <!-- Dust/grain overlay (subtle) -->
+      <filter id="grain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+        <feColorMatrix type="saturate" values="0"/>
+        <feBlend in="SourceGraphic" mode="overlay"/>
+      </filter>
+      <rect width="800" height="1100" fill="none" filter="url(#grain)" opacity="0.04"/>
+
+    </svg>
+
+    <!-- ── CONTENT OVERLAY ── -->
+    <div class="poster-content">
+
+      <!-- Production badge -->
+      <div class="prod-badge">A Ward 13 Production</div>
+
+      <!-- Rating -->
+      <div class="rating-strip">&#x1F512; Rated M</div>
+
+      <!-- Title block -->
+      <div class="title-block">
+        <span class="title-eyebrow">University Game Project &mdash; 2025</span>
+        <div class="main-title">ECHOES OF<br><span class="ward-num">WARD 13</span></div>
+      </div>
+
+      <!-- Bottom section -->
+      <div class="bottom-section">
+
+        <!-- Tagline -->
+        <div class="tagline">The Dark Hears Your Heartbeat</div>
+
+        <!-- Three key icons + battery icon -->
+        <div class="icons-row">
+
+          <!-- Key 1 — Ground Floor -->
+          <div class="icon-label">
+            <svg width="34" height="62" viewBox="0 0 34 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="17" cy="14" r="10" stroke="#8b0000" stroke-width="2" fill="none" opacity="0.9"/>
+              <circle cx="17" cy="14" r="5"  stroke="#8b0000" stroke-width="1.5" fill="none" opacity="0.6"/>
+              <line x1="17" y1="24" x2="17" y2="56" stroke="#8b0000" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+              <line x1="17" y1="38" x2="24" y2="44" stroke="#8b0000" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+              <line x1="17" y1="48" x2="24" y2="54" stroke="#8b0000" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+            </svg>
+            <span class="icon-caption">Ground Floor</span>
+          </div>
+
+          <!-- Battery icon — running low -->
+          <div class="icon-label">
+            <svg width="52" height="28" viewBox="0 0 52 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Battery outline -->
+              <rect x="1" y="4" width="44" height="20" rx="3" stroke="#8b0000" stroke-width="1.8" fill="none" opacity="0.9"/>
+              <!-- Terminal nub -->
+              <rect x="45" y="10" width="6" height="8" rx="2" fill="#8b0000" opacity="0.7"/>
+              <!-- Low charge bar (only 1 of 4 segments) -->
+              <rect x="4"  y="7" width="8"  height="14" rx="1" fill="#8b0000" opacity="0.9"/>
+              <!-- Empty segments -->
+              <rect x="15" y="7" width="8"  height="14" rx="1" fill="#2a0000" opacity="0.5"/>
+              <rect x="26" y="7" width="8"  height="14" rx="1" fill="#2a0000" opacity="0.5"/>
+              <rect x="37" y="7" width="4"  height="14" rx="1" fill="#2a0000" opacity="0.5"/>
+              <!-- Warning dot -->
+              <circle cx="26" cy="28" r="2.5" fill="#8b0000" opacity="0.8"/>
+            </svg>
+            <span class="icon-caption">Battery Critical</span>
+          </div>
+
+          <!-- Key 2 — Basement -->
+          <div class="icon-label">
+            <svg width="34" height="62" viewBox="0 0 34 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="17" cy="14" r="10" stroke="#8b0000" stroke-width="2" fill="none" opacity="0.9"/>
+              <circle cx="17" cy="14" r="5"  stroke="#8b0000" stroke-width="1.5" fill="none" opacity="0.6"/>
+              <line x1="17" y1="24" x2="17" y2="56" stroke="#8b0000" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+              <line x1="17" y1="38" x2="24" y2="44" stroke="#8b0000" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+              <line x1="17" y1="48" x2="24" y2="54" stroke="#8b0000" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+            </svg>
+            <span class="icon-caption">Basement</span>
+          </div>
+
+          <!-- Key 3 — Third Floor -->
+          <div class="icon-label">
+            <svg width="34" height="62" viewBox="0 0 34 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="17" cy="14" r="10" stroke="#8b0000" stroke-width="2" fill="none" opacity="0.9"/>
+              <circle cx="17" cy="14" r="5"  stroke="#8b0000" stroke-width="1.5" fill="none" opacity="0.6"/>
+              <line x1="17" y1="24" x2="17" y2="56" stroke="#8b0000" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+              <line x1="17" y1="38" x2="24" y2="44" stroke="#8b0000" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+              <line x1="17" y1="48" x2="24" y2="54" stroke="#8b0000" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+            </svg>
+            <span class="icon-caption">3rd Floor</span>
+          </div>
+
+        </div><!-- /icons-row -->
+
+        <!-- Credits bar -->
+        <div class="credits-bar">
+          <div class="credits-text">
+            A Ward 13 Production
+            <span class="sep">|</span>
+            <span class="rated">M</span> Rated M
+            <span class="sep">|</span>
+            HTML5 Survival Horror
+            <span class="sep">|</span>
+            2025
+          </div>
+        </div>
+
+      </div><!-- /bottom-section -->
+
+    </div><!-- /poster-content -->
+
+  </div><!-- /poster -->
+
+</body>
+</html>

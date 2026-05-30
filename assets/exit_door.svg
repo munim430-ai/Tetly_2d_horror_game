@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 90" width="50" height="90">
+  <defs>
+    <!-- Green glow radial gradient around door -->
+    <radialGradient id="doorGlow" cx="50%" cy="52%" r="52%">
+      <stop offset="0%"   stop-color="rgba(0,200,0,0.40)"/>
+      <stop offset="55%"  stop-color="rgba(0,200,0,0.14)"/>
+      <stop offset="100%" stop-color="rgba(0,200,0,0)"/>
+    </radialGradient>
+
+    <!-- Keyhole symbol glow -->
+    <filter id="keyholeGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feDropShadow dx="0" dy="0" stdDeviation="1.5"
+                    flood-color="#00cc00" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Dark background -->
+  <rect width="50" height="90" fill="#0a0a0f"/>
+
+  <!-- "EXIT" label above door -->
+  <text x="25" y="9"
+        font-family="'Courier New', Courier, monospace"
+        font-size="8"
+        fill="#00cc00"
+        text-anchor="middle"
+        letter-spacing="2">EXIT</text>
+
+  <!-- Green aura ellipse behind door -->
+  <ellipse cx="25" cy="54" rx="24" ry="38" fill="url(#doorGlow)"/>
+
+  <!-- Door frame: 40x75, centered at x=5..45, y=13..88 -->
+  <rect x="5" y="13" width="40" height="75" rx="1"
+        fill="#1a1a22" stroke="#2e2e3e" stroke-width="2"/>
+
+  <!-- Door panel: slightly lighter, inset 3px all around -->
+  <rect x="8" y="16" width="34" height="69" rx="1"
+        fill="#202030" stroke="#303048" stroke-width="1"/>
+
+  <!-- Door panel inner frames (detail) -->
+  <rect x="11" y="19" width="28" height="30" rx="1"
+        fill="none" stroke="#282838" stroke-width="1"/>
+  <rect x="11" y="52" width="28" height="30" rx="1"
+        fill="none" stroke="#282838" stroke-width="1"/>
+
+  <!-- Keyhole symbol: centered at (25, 50) -->
+  <g filter="url(#keyholeGlow)">
+    <!-- Upper circle of keyhole -->
+    <circle cx="25" cy="47" r="3.5"
+            fill="#0a0a0f" stroke="#00cc00" stroke-width="0.8"/>
+    <!-- Lower slot of keyhole -->
+    <rect x="23.5" y="47" width="3" height="5" rx="0.8"
+          fill="#0a0a0f" stroke="#00cc00" stroke-width="0.8"/>
+  </g>
+
+  <!-- Door knob -->
+  <circle cx="37" cy="53" r="2"
+          fill="#2a2a3a" stroke="#00cc00" stroke-width="0.6" opacity="0.8"/>
+</svg>

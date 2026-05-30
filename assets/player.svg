@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 120" width="60" height="120">
+  <defs>
+    <!-- Subtle edge darkening for body depth -->
+    <radialGradient id="bodyEdge" cx="50%" cy="50%" r="50%">
+      <stop offset="65%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#1a1a2e" stop-opacity="0.55"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Dark background -->
+  <rect width="60" height="120" fill="#0a0a0f"/>
+
+  <!-- Head: oval 10x12 (rx=10, ry=12), centered at (30,52) -->
+  <ellipse cx="30" cy="52" rx="10" ry="12"
+           fill="#111118" stroke="#222230" stroke-width="0.6"/>
+
+  <!-- Neck connector -->
+  <rect x="27" y="62" width="6" height="6" fill="#111118"/>
+
+  <!-- Body: 20x40, x=20 y=62 -->
+  <rect x="20" y="62" width="20" height="40"
+        fill="#111118" stroke="#222230" stroke-width="0.6"/>
+
+  <!-- Body edge-shading overlay -->
+  <rect x="20" y="62" width="20" height="40" fill="url(#bodyEdge)"/>
+
+  <!-- Arms: stubby horizontal rectangles -->
+  <rect x="12" y="64" width="8" height="6" rx="2"
+        fill="#111118" stroke="#222230" stroke-width="0.5"/>
+  <rect x="40" y="64" width="8" height="6" rx="2"
+        fill="#111118" stroke="#222230" stroke-width="0.5"/>
+
+  <!-- Legs -->
+  <rect x="21" y="100" width="7" height="14" rx="1"
+        fill="#111118" stroke="#222230" stroke-width="0.5"/>
+  <rect x="32" y="100" width="7" height="14" rx="1"
+        fill="#111118" stroke="#222230" stroke-width="0.5"/>
+
+  <!-- Subtle white eye dot -->
+  <circle cx="30" cy="50" r="1.4" fill="rgba(255,255,255,0.55)"/>
+</svg>
