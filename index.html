@@ -624,6 +624,10 @@ function updatePlayer(dt) {
   else if (!lit) fearDelta += 0.01 * (dt / 16.67);
   if (player.hiding) fearDelta = -0.05 * (dt / 16.67);
   player.fear = Math.max(0, Math.min(100, player.fear + fearDelta));
+  // Passive fear decay: lights on, entity far away, not hiding
+  if (player.flashlight && entityDist > 500 && !player.hiding) {
+    player.fear = Math.max(0, player.fear - 0.015 * (dt / 16.67));
+  }
 
   // Passive fear decay when flashlight on and entity is distant
   const entityDist2 = Math.abs(entity.x - player.x);
