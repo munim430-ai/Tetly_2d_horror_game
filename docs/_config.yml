@@ -1,0 +1,15 @@
+# GitHub Pages Configuration
+# Disable Jekyll processing for this site
+# This allows us to serve custom HTML files directly
+
+skip_some_rules:
+  - MD003
+  - MD004
+  - MD012
+
+# Disable Jekyll theme to prevent build conflicts
+theme: null
+
+# Include all files (including those starting with underscore)
+include:
+  - ".nojekyll"
