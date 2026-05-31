@@ -1,5 +1,15 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
 	font-family: Helvetica;
+	background: #000;
+	overflow-x: hidden;
+}
+
+canvas {
+	display: block;
+	max-width: 100vw;
+	height: auto !important;
 }
 
 #gameControls {
