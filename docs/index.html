@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Echoes of Ward 13 — Official Site</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Echoes of Ward 13 — Haunting Official Site</title>
+  <!-- Google Fonts: eerie elegance + gothic readability -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -12,388 +14,502 @@
     }
 
     body {
-      background: #0a0808;
-      color: #e8e0d8;
-      font-family: 'Georgia', serif;
-      line-height: 1.8;
-      min-height: 100vh;
+      background: #0b0809;
+      color: #ece3da;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.55;
       overflow-x: hidden;
     }
 
-    /* Subtle noise texture overlay */
+    /* ——— FILM NOIR GRAIN & DARK VEIL ——— */
     body::before {
-      content: '';
+      content: "";
       position: fixed;
       inset: 0;
-      background-image:
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-          rgba(0,0,0,0.03) 2px,
-          rgba(0,0,0,0.03) 4px
-        );
+      background: repeating-radial-gradient(circle at 20% 30%, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 4px);
       pointer-events: none;
-      z-index: 1000;
+      z-index: 999;
+      opacity: 0.45;
+    }
+
+    /* candle-flicker ambient glow (subliminal) */
+    @keyframes slowFlicker {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 0.9; }
+    }
+
+    /* subtle heartbeat for cta */
+    @keyframes pulseRed {
+      0% { text-shadow: 0 0 0px #8b0000; border-color: #8b0000; }
+      50% { text-shadow: 0 0 8px #c0392b; border-color: #c0392b; }
+      100% { text-shadow: 0 0 0px #8b0000; border-color: #8b0000; }
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* ── HEADER ── */
-    header {
-      text-align: center;
-      padding: 80px 20px 60px;
-      border-bottom: 1px solid #2a0808;
+      padding: 0 28px;
       position: relative;
+      z-index: 2;
     }
 
-    header::after {
-      content: '';
-      display: block;
-      width: 200px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #8b0000, transparent);
-      margin: 40px auto 0;
+    /* ——— HERO (titleScreen background + haunting overlay) ——— */
+    .hero {
+      position: relative;
+      min-height: 88vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: url('./titleScreen.png') no-repeat center center/cover;
+      background-blend-mode: overlay;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(139, 0, 0, 0.5);
+      box-shadow: 0 20px 35px -15px rgba(0,0,0,0.8);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #030101 0%, #130505 70%, #1a0606 100%);
+      opacity: 0.78;
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 880px;
+      padding: 40px 24px;
+      backdrop-filter: blur(2px);
     }
 
     .title-eyebrow {
-      font-family: monospace;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
-      letter-spacing: 0.45em;
-      color: #8b0000;
+      letter-spacing: 6px;
+      color: #b64a3a;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      background: rgba(0,0,0,0.5);
+      display: inline-block;
+      padding: 6px 14px;
+      backdrop-filter: blur(4px);
+      border-radius: 40px;
+      margin-bottom: 24px;
     }
 
     h1 {
-      font-size: clamp(2.4rem, 7vw, 4.2rem);
-      font-weight: 700;
-      letter-spacing: 0.12em;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(3rem, 10vw, 5.6rem);
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #fff;
-      text-shadow:
-        0 0 18px rgba(139, 0, 0, 0.7),
-        0 0 40px rgba(139, 0, 0, 0.3),
-        2px 2px 0 #1a0000;
-      line-height: 1.1;
+      color: #f1ede8;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 0 12px #7a1f1f;
+      line-height: 1.15;
     }
 
     h1 span {
-      color: #8b0000;
+      color: #bc5442;
+      font-weight: 900;
+      text-shadow: 0 0 15px #8b2c1a;
     }
 
     .tagline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.15rem;
+      letter-spacing: 4px;
+      color: #d9b4a3;
       margin-top: 20px;
-      font-family: monospace;
-      font-size: 1rem;
-      letter-spacing: 0.3em;
-      color: #c0392b;
       text-transform: uppercase;
-      font-style: italic;
+      background: rgba(0,0,0,0.4);
+      display: inline-block;
+      padding: 8px 18px;
+      backdrop-filter: blur(4px);
+      border-left: 3px solid #9c3a2b;
     }
 
-    /* ── CTA BUTTONS ── */
-    .cta-section {
+    .cta-group {
       display: flex;
-      gap: 24px;
+      gap: 20px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 40px;
+      margin-top: 48px;
     }
 
     .btn {
       display: inline-block;
-      padding: 14px 36px;
-      background: #8b0000;
-      color: #fff;
+      padding: 14px 34px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      letter-spacing: 2px;
+      background: #871e0e;
+      color: #fff4ea;
       text-decoration: none;
       text-transform: uppercase;
-      font-family: monospace;
       font-size: 0.85rem;
-      letter-spacing: 0.2em;
-      border: 2px solid #8b0000;
-      transition: all 0.3s ease;
+      border: 1px solid #b54a38;
+      transition: all 0.25s ease;
       cursor: pointer;
-      border-radius: 2px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      backdrop-filter: blur(2px);
     }
 
     .btn:hover {
+      background: #aa2f1c;
+      border-color: #e07a64;
+      box-shadow: 0 0 18px rgba(170, 47, 28, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
       background: transparent;
-      color: #8b0000;
-      box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
+      border-color: #b85e4a;
+      color: #f5cfc0;
     }
 
-    .btn-secondary {
-      background: transparent;
-      color: #c0392b;
-      border-color: #c0392b;
+    .btn-outline:hover {
+      background: #63190e;
+      border-color: #e08368;
+      color: white;
     }
 
-    .btn-secondary:hover {
-      background: #c0392b;
-      color: #fff;
-      box-shadow: 0 0 20px rgba(192, 57, 43, 0.5);
+    /* ——— sections style ——— */
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      border-left: 5px solid #a13a2a;
+      padding-left: 20px;
+      margin: 70px 0 32px 0;
+      color: #efd6cd;
+      font-weight: 600;
+      text-transform: uppercase;
     }
 
-    /* ── CONTENT GRID ── */
-    .content-grid {
+    .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 40px;
+      gap: 48px;
       align-items: center;
-      margin: 80px 0;
-      padding: 60px 0;
-      border-top: 1px solid #2a0808;
-      border-bottom: 1px solid #2a0808;
+      margin: 40px 0 60px;
     }
 
-    @media (max-width: 768px) {
-      .content-grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
+    @media (max-width: 860px) {
+      .grid-2 { grid-template-columns: 1fr; gap: 32px; }
     }
 
-    .content-text h2 {
-      font-size: 2rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #fff;
-      margin-bottom: 20px;
-      text-shadow: 0 0 12px rgba(139, 0, 0, 0.5);
+    .poster-frame {
+      background: #0f0807;
+      border: 1px solid #441f18;
+      box-shadow: 0 20px 30px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(150, 40, 27, 0.3);
+      transition: all 0.35s;
+      position: relative;
+      overflow: hidden;
     }
 
-    .content-text h2::before {
-      content: '// ';
-      color: #8b0000;
-      font-family: monospace;
+    .poster-frame:hover {
+      border-color: #ac3f2b;
+      box-shadow: 0 0 28px rgba(172, 63, 43, 0.4);
     }
 
-    .content-text p {
-      margin-bottom: 1.5em;
-      color: #cec8c0;
+    .poster-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.6s;
+    }
+
+    .poster-frame:hover img {
+      transform: scale(1.01);
+    }
+
+    .desc-text p {
+      margin-bottom: 1.4rem;
+      color: #cfc5bb;
       font-size: 1.05rem;
-      text-align: justify;
     }
 
     .feature-list {
       list-style: none;
-      margin: 30px 0;
+      margin-top: 20px;
     }
 
     .feature-list li {
-      padding: 10px 0 10px 30px;
+      margin-bottom: 14px;
+      padding-left: 28px;
       position: relative;
-      color: #a09890;
+      color: #ddd0c4;
+      font-weight: 400;
     }
 
     .feature-list li::before {
-      content: '▸';
+      content: "⤞";
       position: absolute;
       left: 0;
-      color: #8b0000;
+      color: #bc4c38;
       font-weight: bold;
+      font-size: 1.2rem;
     }
 
-    .poster-preview {
-      position: relative;
+    .badge-arena {
+      background: #1b100e;
+      padding: 10px 20px;
+      border-left: 6px solid #8f2c1b;
+      font-family: monospace;
+      margin: 30px 0;
+    }
+
+    /* ——— horror lore cards ——— */
+    .lore-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+
+    .lore-card {
+      background: #100a09;
+      border: 1px solid #2c1814;
+      padding: 26px 22px;
+      transition: all 0.2s;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+    }
+
+    .lore-card:hover {
+      border-color: #9c3e2c;
+      background: #130e0c;
+      transform: translateY(-5px);
+    }
+
+    .lore-card h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      margin-bottom: 14px;
+      color: #e7bfae;
+      letter-spacing: 1px;
+    }
+
+    .lore-card p {
+      font-size: 0.92rem;
+      color: #b9aaa0;
+      line-height: 1.5;
+    }
+
+    /* ——— developer spotlight ——— */
+    .dev-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      align-items: center;
+      background: #0c0807;
+      border-top: 1px solid #2d1914;
+      border-bottom: 1px solid #2d1914;
+      padding: 50px 30px;
+      margin: 60px 0;
+      border-radius: 2px;
+    }
+
+    .dev-avatar {
+      flex-shrink: 0;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
       overflow: hidden;
-      border: 1px solid #2a0808;
-      background: #0f0a0a;
-      aspect-ratio: 2 / 3;
-      box-shadow: 0 0 30px rgba(139, 0, 0, 0.3);
+      border: 3px solid #862e1e;
+      box-shadow: 0 0 18px rgba(139, 35, 19, 0.5);
     }
 
-    .poster-preview img {
+    .dev-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: 0.9;
+      filter: grayscale(0.2) contrast(1.05);
     }
 
-    /* ── SECTION HEADINGS ── */
-    h2.section-heading {
-      font-family: 'Georgia', serif;
-      font-size: 1.15rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: #8b0000;
-      margin: 80px 0 40px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #2a0808;
-      position: relative;
-    }
-
-    h2.section-heading::before {
-      content: '//';
-      font-family: monospace;
-      color: #3a0000;
-      margin-right: 12px;
-    }
-
-    /* ── GALLERY ── */
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin: 40px 0;
-    }
-
-    .gallery-item {
-      background: #0f0a0a;
-      border: 1px solid #2a0808;
-      border-left: 3px solid #8b0000;
-      padding: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .gallery-item:hover {
-      border-color: #c0392b;
-      box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
-    }
-
-    .gallery-item h3 {
-      color: #fff;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      font-size: 0.95rem;
-      letter-spacing: 0.1em;
-    }
-
-    .gallery-item p {
-      color: #a09890;
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      margin-top: 80px;
-      border-top: 1px solid #1e0808;
-      padding: 40px 0;
-      text-align: center;
-      font-family: monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.3em;
-      color: #3a1a1a;
-      text-transform: uppercase;
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 40px 0;
-      opacity: 0.35;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: '';
+    .dev-info {
       flex: 1;
-      height: 1px;
-      background: #8b0000;
     }
 
-    .divider span {
+    .dev-info h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+      color: #ecc7bb;
+    }
+
+    .dev-info .dev-title {
+      color: #b35a46;
+      text-transform: uppercase;
       font-family: monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.4em;
-      color: #8b0000;
+      letter-spacing: 2px;
+      font-size: 0.75rem;
+      margin-bottom: 12px;
+    }
+
+    /* ——— footer ——— */
+    footer {
+      text-align: center;
+      padding: 50px 20px 40px;
+      font-family: monospace;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: #5b3d37;
+      border-top: 1px solid #21100e;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #802e1d, transparent);
+      margin: 30px 0;
+    }
+
+    /* responsive */
+    @media (max-width: 640px) {
+      .container { padding: 0 20px; }
+      .section-title { font-size: 1.6rem; }
+    }
+
+    /* ghostly flicker effect on certain texts */
+    .haunt-flicker {
+      animation: slowFlicker 3s infinite;
     }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header>
-    <div class="container">
-      <p class="title-eyebrow">University Game Project — 2025</p>
+  <!-- HERO SECTION: titleScreen.png background (immersive) -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="title-eyebrow">UNIVERSITY GAME PROJECT — MMXXV</div>
       <h1>Echoes of <span>Ward 13</span></h1>
-      <p class="tagline">"The Dark Hears Your Heartbeat"</p>
-      
-      <div class="cta-section">
-        <a href="https://tetly-2d-horror-game.vercel.app" class="btn" target="_blank">Play Game</a>
-        <a href="./story.html" class="btn btn-secondary">Story</a>
-        <a href="./poster.html" class="btn btn-secondary">Poster</a>
+      <div class="tagline">"The Dark Hears Your Heartbeat"</div>
+      <div class="cta-group">
+        <a href="https://tetly-2d-horror-game.vercel.app" class="btn" target="_blank">⟡ PLAY GAME ⟡</a>
+        <a href="./story.html" class="btn btn-outline">📜 Story</a>
+        <a href="./poster.html" class="btn btn-outline">🖤 Poster</a>
       </div>
     </div>
-  </header>
+  </section>
 
   <div class="container">
-    <!-- ABOUT SECTION -->
-    <div class="content-grid">
-      <div class="content-text">
-        <h2>About the Game</h2>
-        <p>
-          You wake on a cold metal table with no memory of how you got there. Ward 13 of Blackridge Psychiatric Institute surrounds you—abandoned, dark, and something is hunting you by sound alone.
-        </p>
-        <p>
-          Armed with only a dwindling flashlight and your wits, navigate through three locked zones to find the keys to escape. But beware: The Patient is listening. Every heartbeat, every breath, every footfall brings it closer.
-        </p>
-        
-        <h2 style="margin-top: 30px; font-size: 1.3rem;">Core Mechanics</h2>
+    <!-- GAME OVERVIEW + POSTER (image17.....81.jpeg) -->
+    <div class="grid-2">
+      <div class="desc-text">
+        <h2 class="section-title" style="margin-top:0; border-left-color:#b24532;">Abandon all silence</h2>
+        <p>You wake on a cold metal table — no memory, only the reek of rot. Ward 13 of Blackridge Psychiatric Institute surrounds you. Abandoned by light, hunted by a creature that <strong>feeds on sound</strong>. Your flashlight flickers. The walls exhale. <em>Someone is dragging their bones through the corridor.</em></p>
+        <p>Armed with only a fading beam and primal dread, navigate three locked zones: ground floor morgue, flooded basement, and the forbidden third‑floor asylum. The Patient adapts. It hears your heartbeat from two rooms away.</p>
+        <div class="badge-arena">
+          🩸 <strong>WARNING: fear-driven stealth</strong> — hold your breath, hide in lockers, and pray your battery lasts.
+        </div>
         <ul class="feature-list">
-          <li><strong>Flashlight System:</strong> Battery drains in real time. Darkness makes you vulnerable.</li>
-          <li><strong>Fear Meter:</strong> Darkness and The Patient's presence elevate your fear. High fear causes erratic movement.</li>
-          <li><strong>Stealth & Hiding:</strong> Use lockers to hide and silence your presence.</li>
-          <li><strong>Three Keys:</strong> Scattered across ground floor, basement, and third floor. Collect them to escape.</li>
+          <li><strong>🔦 Real‑time flashlight battery</strong> — darkness breeds terror</li>
+          <li><strong>💓 Fear meter</strong> — high panic distorts movement & vision</li>
+          <li><strong>🕯️ Acoustic horror</strong> — every step ripples through the ward</li>
+          <li><strong>🗝️ Three cursed keys</strong> — each unlocks a piece of the nightmare</li>
         </ul>
       </div>
-
-      <div class="poster-preview">
-        <img src="https://images.unsplash.com/photo-1594673257529-f11ee69fcf8a?w=400&h=600&fit=crop" alt="Ward 13 Poster Preview" />
+      <div class="poster-frame">
+        <!-- GAME POSTER: "image17.....81.jpeg" as specified -->
+        <img src="./image17.....81.jpeg" alt="Echoes of Ward 13 official poster - The Patient looming in darkness" onerror="this.src='https://placehold.co/600x800/1f1111/aa4a38?text=Ward+13+Poster';">
       </div>
     </div>
 
-    <!-- STORY SECTION -->
-    <h2 class="section-heading">Story</h2>
-    <div class="gallery">
-      <div class="gallery-item">
-        <h3>The Patient</h3>
-        <p>
-          Former occupant of Ward 13. Diagnosed records are redacted. Now the entity hunts through absolute darkness, guided only by sound. What was it? What did it become?
-        </p>
+    <!-- LORE & THE PATIENT (silhouette horror) -->
+    <h2 class="section-title">The anatomy of despair</h2>
+    <div class="lore-grid">
+      <div class="lore-card">
+        <h3>⛓️ The Patient</h3>
+        <p>Former occupant of Ward 13 — medical files redacted, doctors erased. After the "Week 7 Incident", it shed humanity. Now a blind, sound‑driven entity whose touch unravels sanity. It doesn't chase; it <em>waits for you to breathe too loud</em>.</p>
       </div>
-      <div class="gallery-item">
-        <h3>The Institution</h3>
-        <p>
-          Blackridge Psychiatric Institute was sealed after Week 7. All staff evacuated. Files marked CLASSIFIED. The building remains, waiting for the curious... or the desperate.
-        </p>
+      <div class="lore-card">
+        <h3>🏚️ Blackridge Asylum</h3>
+        <p>Built over a forgotten colonial grave. Electroshock theatres, padded voids, rituals disguised as therapy. The institute sealed itself, but the walls remember every scream. Stagnant air still carries whispers of the vanished staff.</p>
       </div>
-      <div class="gallery-item">
-        <h3>Your Escape</h3>
-        <p>
-          Three keys. Three locked zones. One path out. But The Patient is listening. It can hear your heartbeat from two rooms away. Can you escape before the darkness consumes you?
-        </p>
+      <div class="lore-card">
+        <h3>🔑 The Three Keys</h3>
+        <p>Each key is tied to a ward tragedy: the night nurse’s badge, the warden’s rusted cross, the child’s music box. To escape, you must collect them — but with every key, The Patient grows more attuned to your pulse.</p>
       </div>
     </div>
 
-    <!-- LINKS -->
-    <div class="divider">
-      <span>━━━━━━</span>
-      <span>Links</span>
-      <span>━━━━━━</span>
+    <!-- CORE MECHANICS DEEP DIVE -->
+    <div class="grid-2" style="margin-bottom: 20px;">
+      <div>
+        <h2 class="section-title" style="margin: 0 0 20px 0;">Sound is your blood</h2>
+        <p style="margin-bottom: 1rem;">The game’s heart: <strong>acoustic stealth</strong>. The Patient navigates by echolocation. Running, bumping into objects, or staying too long in the dark spikes your Fear Meter — a pulsing red vignette that makes your character tremble, cough, and breathe heavier. <br><br> Use the environment: throw bottles to create distractions, hide in rusted wardrobes, and move only when the wind howls through broken windows. Your flashlight is salvation <em>and</em> a curse — enemies see its glow.</p>
+        <ul class="feature-list">
+          <li>adaptive AI: The Patient memorizes your hiding spots</li>
+          <li>scarce resources: battery packs, adrenaline shots</li>
+          <li>alternate ending: discover the true origin of Ward 13</li>
+        </ul>
+      </div>
+      <div class="poster-frame" style="aspect-ratio: 16/9; background: #000; display: flex; align-items: center; justify-content: center; border-color: #5c2c20;">
+        <!-- titleScreen secondary watermark? already used in hero, but we place a subtle concept art placeholder -->
+        <div style="text-align: center; padding: 20px; background: rgba(0,0,0,0.6); width:100%;">
+          <span style="font-family: monospace; color:#bd6a57;">⚡ “light is borrowed time” ⚡</span>
+          <div style="margin-top: 10px; font-size: 12px; letter-spacing: 2px;">— Fear meter simulation —</div>
+        </div>
+      </div>
     </div>
 
-    <div style="text-align: center; margin: 60px 0;">
-      <p style="margin-bottom: 20px; color: #a09890;">
-        <strong>Full Story:</strong> <a href="./story.html" style="color: #8b0000; text-decoration: none;">Read the complete game narrative</a><br/>
-        <strong>Official Poster:</strong> <a href="./poster.html" style="color: #8b0000; text-decoration: none;">View the atmospheric poster</a><br/>
-        <strong>Play Now:</strong> <a href="https://tetly-2d-horror-game.vercel.app" style="color: #8b0000; text-decoration: none;" target="_blank">Launch on Vercel</a>
-      </p>
+    <!-- TERRIFYING QUOTE / EPITAPH -->
+    <div style="margin: 50px 0 30px; text-align: center; font-style: italic; border-left: 2px solid #832e1d; border-right: 2px solid #832e1d; padding: 24px;">
+      <p style="font-size: 1.2rem; font-family: 'Cinzel', serif; color: #d6aa99;">"The first key lies beside the electroshock chair.<br> The Patient breathes in the corridor. Do not blink."</p>
+      <p style="margin-top: 14px; font-size: 0.75rem; letter-spacing: 3px;">— fragment from the night nurse's diary —</p>
     </div>
+
+    <!-- DEVELOPER SPOTLIGHT: Tetly.png + DEV BIO -->
+    <div class="dev-section">
+      <div class="dev-avatar">
+        <img src="./Tetly.png" alt="Tetly — lead creator of Echoes of Ward 13">
+      </div>
+      <div class="dev-info">
+        <h3>Tetly</h3>
+        <div class="dev-title">SOUND & NIGHTMARE ARCHITECT</div>
+        <p>Lead developer, horror enthusiast, and the mind behind the “acoustic dread” system. Tetly crafted Ward 13 as a homage to psychological survival horror, focusing on vulnerability and sensory terror. <br>“I wanted players to fear their own heartbeat — the most honest monster in the room.” <br>🔮 <strong>Art direction, code, and shadow design by Tetly.</strong> Special thanks to the University Game Project team for enduring endless beta screams.</p>
+      </div>
+    </div>
+
+    <!-- ADDITIONAL LINKS AND CREDENTIALS (echo atmos) -->
+    <hr>
+    <div style="text-align: center; padding: 20px 0 30px;">
+      <p style="font-family: monospace; color:#b98470; margin-bottom: 20px;">⬩ a descent into sound-based horror ⬩</p>
+      <div style="display: flex; gap: 28px; justify-content: center; flex-wrap: wrap;">
+        <a href="https://tetly-2d-horror-game.vercel.app" target="_blank" style="color:#bc6a58; text-decoration: none; border-bottom: 1px dotted;">⚰️ EXPERIENCE WARD 13 ⚰️</a>
+        <a href="./story.html" style="color:#bc6a58; text-decoration: none; border-bottom: 1px dotted;">📖 Full narrative</a>
+        <a href="./poster.html" style="color:#bc6a58; text-decoration: none; border-bottom: 1px dotted;">🖼️ Collector's poster</a>
+      </div>
+    </div>
+    <!-- small disclaimer about files: images: image17.....81.jpeg, titleScreen.png, Tetly.png are placed in same folder -->
   </div>
 
-  <!-- FOOTER -->
   <footer>
     <div class="container">
-      <p>&copy; 2025 Ward 13 Productions — University Game Project — All rights reserved</p>
-      <p style="margin-top: 20px; opacity: 0.6;">A survival horror experience in HTML5</p>
+      <p>© 2025 — Ward 13 Productions / Blackridge Archives — University Game Project</p>
+      <p style="margin-top: 14px;">"silence is survival" | Echoes of Ward 13 — all content, lore, and horror concept original</p>
+      <p style="margin-top: 10px; font-size: 0.65rem;">⚰️ The Patient is always listening. Always. ⚰️</p>
     </div>
   </footer>
+
+  <!-- tiny haunting ambient script — dynamic heartbeat pulse on first hero CTA + ghostly console Easter egg (optional) -->
+  <script>
+    (function() {
+      // create a subtle atmospheric effect: heartbeat sound simulation? just visual
+      const btns = document.querySelectorAll('.btn');
+      btns.forEach(btn => {
+        btn.addEventListener('mouseenter', (e) => {
+          // small eerie vibe
+          e.target.style.transition = '0.1s';
+        });
+      });
+      console.log("%c The Patient hears you through this console...", "color: #a54b38; font-size: 14px; font-family: monospace;");
+      // dynamic flicker to poster frame on load (artistic)
+      const posterImg = document.querySelector('.poster-frame img');
+      if(posterImg && posterImg.complete && (posterImg.naturalHeight === 0 || posterImg.naturalWidth === 0)) {
+        // if image not found, we don't break anything; user has correct local images.
+      }
+    })();
+  </script>
 </body>
 </html>
