@@ -60,29 +60,18 @@ Obstacle.prototype.constructor = Obstacle;
 
 Obstacle.prototype.update = function() {
 
-	//Collision with the ground and other obstacles in different groups
+	// Only run collision checks relevant to this obstacle type
 	var collision1 = game.physics.arcade.collide(platforms, this);
-	var collision2 = game.physics.arcade.collide(obstacleGroup, this);
-	var collision3 = game.physics.arcade.collide(obstacleClimbGroup, this);
-	var collision4 = game.physics.arcade.collide(obstacleHideGroup, this);
-	var collision5 = game.physics.arcade.collide(obstaclePushGroup, this);
-	var collision6 = game.physics.arcade.collide(obstacleEnemyPushGroup, this);
+	var collision2 = this.pushable ? game.physics.arcade.collide(obstacleGroup, this) : false;
+	var collision3 = this.gravityEnabled ? game.physics.arcade.collide(obstacleClimbGroup, this) : false;
+	var collision4 = this.gravityEnabled ? game.physics.arcade.collide(obstacleHideGroup, this) : false;
+	var collision5 = this.pushable ? game.physics.arcade.collide(obstaclePushGroup, this) : false;
+	var collision6 = this.pushable ? game.physics.arcade.collide(obstacleEnemyPushGroup, this) : false;
 
-	//Check collision with the player
-	if (this.collidable == 'top') {
-		if(isClimbing == false){
-			isColliding = true;
-		}
-		else{
-			isColliding = false;
-		}
+	if (this.collidable === 'top') {
+		isColliding = !isClimbing;
 	}
-	if(this.collidable == 'full'){
-		game.physics.arcade.collide(player, obstacleGroup);
-		if(foreground == true){
-			game.physics.arcade.collide(player, [obstacleGroup,obstaclePushGroup]);
-		}
-	}
+	// Player–obstacle collisions handled centrally in playState.update()
 
 	//Case for obstacles with "none" collision
 	//Turn on collision on top when hiding behind an hidable object

@@ -58,10 +58,12 @@ var invFloor1; var invFloor2; var invFloor3; var invEntrance; var invBack; var i
 var inventoryOpen = false; // var to help with killing of inventory sprites
 var elevatorOpen = false;
 var elevatorString = ''; // needs to be global for button keyboard integration
+var elevatorKeyboardSetup = false;
+var caughtProcessing = false;
+var touchKeys = { left: false, right: false, jumpPressed: false, interactPressed: false, hidePressed: false, inventoryPressed: false };
 
 var playState = {
 	create: function() {
-		console.log('Play: create');
 		
 		//begin hospital music
 		music = game.add.audio('hospitalMusic');
@@ -151,15 +153,23 @@ var playState = {
 
 		//Use E key to interact with notes, doors, and elevators
 		this.interactKey = game.input.keyboard.addKey(Phaser.Keyboard.E);
-		this.interactKey.onDown.add(this.interact);
+		this.interactKey.onDown.add(this.interact, this);
 
 		// Use I key for inventory
 		this.inventoryKey = game.input.keyboard.addKey(Phaser.Keyboard.I);
-		this.inventoryKey.onDown.add(this.inventory);
+		this.inventoryKey.onDown.add(this.inventory, this);
+
+		game.onBlur.add(function() { game.paused = true; });
+		game.onFocus.add(function() { game.paused = false; });
 
 	},
 
 	update: function(){
+		if (touchKeys.jumpPressed)      { touchKeys.jumpPressed = false;      this.jump(); }
+		if (touchKeys.interactPressed)  { touchKeys.interactPressed = false;  this.interact(); }
+		if (touchKeys.hidePressed)      { touchKeys.hidePressed = false;      this.hide(); }
+		if (touchKeys.inventoryPressed) { touchKeys.inventoryPressed = false; this.inventory(); }
+
 		//Collision and overlap checks for the player
 		if(foreground == true){
 			hitPlatform = game.physics.arcade.collide(player, [platforms,obstacleGroup,obstaclePushGroup,obstacleEnemyPushGroup]);
@@ -204,41 +214,34 @@ var playState = {
 			} 
 		});
 
-		// send you back to the start for getting caught
-		enemyGroup.forEach(function (c) {
-			// if you are touching this enemy and this enemy sees you
-			if(game.physics.arcade.overlap(player, c) && c.seesPlayer == true) {
-				//add a timer
-				timer = game.time.create();
-
-				//reset player properties
-				playerSpawnX = 120;
-				player.body.velocity.x = 0;
-				player.body.velocity.y = 0;
-				canMove = false;
-				c.body.velocity.x = 0;
-
-				//fade to black screen in a 500 ms timeframe
-				var restart = game.add.tileSprite(0,0,1200,800, 'blackScreen');
-				restart.alpha = 0;
-				restart.fixedToCamera =  true;
-				game.add.tween(restart).to( {alpha: 1}, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
-				timer.add(500, function (){
-					//after 500 ms generate starting room
-					generateLevel('level0');
-					//then fade out of black back to visibility
-					game.add.tween(restart).to( {alpha: 0}, 500, Phaser.Easing.Linear.None, true, 0, 0, false)
-				},this);
-				timer.add(1400, function(){
-					//once fades are done, player can move again and black screen is destroyed
-					canMove = true;
-					restart.destroy();
-				}, this);
-
-				//start the timer when function starts
-				timer.start();
-			}
-		});
+		// send you back to the start for getting caught (caughtProcessing prevents retriggering every frame)
+		if (!caughtProcessing) {
+			enemyGroup.forEach(function (c) {
+				if(game.physics.arcade.overlap(player, c) && c.seesPlayer == true && !caughtProcessing) {
+					caughtProcessing = true;
+					timer = game.time.create();
+					playerSpawnX = 120;
+					player.body.velocity.x = 0;
+					player.body.velocity.y = 0;
+					canMove = false;
+					c.body.velocity.x = 0;
+					var restart = game.add.tileSprite(0,0,1200,800, 'blackScreen');
+					restart.alpha = 0;
+					restart.fixedToCamera = true;
+					game.add.tween(restart).to( {alpha: 1}, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
+					timer.add(500, function(){
+						generateLevel('level0');
+						game.add.tween(restart).to( {alpha: 0}, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
+					}, this);
+					timer.add(1400, function(){
+						canMove = true;
+						restart.destroy();
+						caughtProcessing = false;
+					}, this);
+					timer.start();
+				}
+			});
+		}
 
 		// put the key into your inventory after colliding with it
 		keyCardGroup.forEach(function (k) {
@@ -269,10 +272,8 @@ var playState = {
 
 				
 				inventory.push(k.name);
-				console.log('hit key');
 				k.kill();
 				k.destroy();
-				console.log(inventory);
 				game.time.events.add(Phaser.Timer.SECOND * 5, function(){ popUpDisplay.kill(); popUpDisplay.destroy(); popUpDisplay2.kill(); popUpDisplay2.destroy();}, this);
 			}
 		});
@@ -374,7 +375,7 @@ var playState = {
 		if(playerDirection <= 0){
 			playerDirection = 0; //Left
 		}
-		if((this.cursors.left.isDown || game.input.keyboard.isDown(Phaser.Keyboard.A)) && canControl == true && canMove == true){
+		if((this.cursors.left.isDown || game.input.keyboard.isDown(Phaser.Keyboard.A) || touchKeys.left) && canControl == true && canMove == true){
 			//move left
 			playerDirection --; //player was moving left
 			if(foreground == true){
@@ -389,7 +390,7 @@ var playState = {
 					//Walking animation
 					player.animations.play('walkLeft');
 					//Walking sound
-					playerFootsteps.play('',0,.5,false,false);					
+					if (!playerFootsteps.isPlaying) playerFootsteps.play('',0,.5,false,false);					
 				}
 				//jump animation
 				else{
@@ -409,7 +410,7 @@ var playState = {
 				player.body.velocity.x = -75; //crawl speed
 			}
 		}
-		else if((this.cursors.right.isDown || game.input.keyboard.isDown(Phaser.Keyboard.D)) && canControl == true && canMove == true){
+		else if((this.cursors.right.isDown || game.input.keyboard.isDown(Phaser.Keyboard.D) || touchKeys.right) && canControl == true && canMove == true){
 			//move right
 			playerDirection ++; //player was moving right
 			if(foreground == true){
@@ -424,7 +425,7 @@ var playState = {
 					//Walking animation
 					player.animations.play('walkRight');
 					//Walking sound
-					playerFootsteps.play('',0,.5,false,false);
+					if (!playerFootsteps.isPlaying) playerFootsteps.play('',0,.5,false,false);
 				}
 				//jump animation
 				else{
@@ -560,49 +561,49 @@ var playState = {
 
 
 
-		// elevator interaction
-		// Add keyboard input version
-		if (elevatorOpen == true) {
+		// Elevator keyboard: set callback once on open, clear on close
+		if (elevatorOpen && !elevatorKeyboardSetup) {
+			elevatorKeyboardSetup = true;
 			game.input.keyboard.onUpCallback = function(e) {
-				if (e.keyCode == Phaser.Keyboard.ONE || e.keyCode == Phaser.Keyboard.NUMPAD_1) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '1'; elevatorText.setText(elevatorString);}}
-				if (e.keyCode == Phaser.Keyboard.TWO || e.keyCode == Phaser.Keyboard.NUMPAD_2) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '2'; elevatorText.setText(elevatorString);}}
-				if (e.keyCode == Phaser.Keyboard.THREE || e.keyCode == Phaser.Keyboard.NUMPAD_3) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '3'; elevatorText.setText(elevatorString);}}
-				if (e.keyCode == Phaser.Keyboard.FOUR || e.keyCode == Phaser.Keyboard.NUMPAD_4) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '4'; elevatorText.setText(elevatorString);}}
-				if (e.keyCode == Phaser.Keyboard.FIVE || e.keyCode == Phaser.Keyboard.NUMPAD_5) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '5'; elevatorText.setText(elevatorString);}}
-				if (e.keyCode == Phaser.Keyboard.SIX || e.keyCode == Phaser.Keyboard.NUMPAD_6) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '6'; elevatorText.setText(elevatorString);} }
-				if (e.keyCode == Phaser.Keyboard.SEVEN || e.keyCode == Phaser.Keyboard.NUMPAD_7) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '7'; elevatorText.setText(elevatorString);}}
-				if (e.keyCode == Phaser.Keyboard.EIGHT || e.keyCode == Phaser.Keyboard.NUMPAD_8) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '8'; elevatorText.setText(elevatorString);} }
-				if (e.keyCode == Phaser.Keyboard.NINE || e.keyCode == Phaser.Keyboard.NUMPAD_9) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '9'; elevatorText.setText(elevatorString);} }
-				if (e.keyCode == Phaser.Keyboard.ZERO || e.keyCode == Phaser.Keyboard.NUMPAD_0) { buttonPressSound.play(); if(elevatorString == "Invalid") { elevatorString = '';} if(elevatorString.length < 4) {elevatorString += '0'; elevatorText.setText(elevatorString);}}
-				if (e.keyCode == Phaser.Keyboard.ENTER || e.keyCode == Phaser.Keyboard.NUMPAD_ENTER) { buttonPressSound.play(); var shouldDestroy = false;
-						if(elevatorString == '1379') {playerSpawnX = 621; generateLevel('level3'); shouldDestroy = true;} 
-						else if(elevatorString == '2821') {playerSpawnX = 621; generateLevel('level2'); shouldDestroy = true;}
-						else if(elevatorString == '3462') {playerSpawnX = 621; generateLevel('level1'); shouldDestroy = true;}
-						else if(elevatorString == '0117') {playerSpawnX = 214; generateLevel('morgueFloor'); shouldDestroy = true;}
-						else if (elevatorString == '0379') {playerSpawnX = 214; generateLevel('receptionFloor'); shouldDestroy = true;}
-						else {elevatorString = 'Invalid'}
-						if (shouldDestroy == true) {
-							elevatorBackground.destroy();
-							button1.destroy();
-							button2.destroy();
-							button3.destroy();
-							button4.destroy();
-							button5.destroy();
-							button6.destroy();
-							button7.destroy();
-							button8.destroy();
-							button9.destroy();
-							button0.destroy();
-							buttonEnter.destroy();
-							elevatorText.destroy();
-							elevatorOpen = false;
-							canMove = true;
-						}
-						elevatorText.setText(elevatorString);}
-			}
+				var digits = {};
+				digits[Phaser.Keyboard.ONE]=digits[Phaser.Keyboard.NUMPAD_1]='1';
+				digits[Phaser.Keyboard.TWO]=digits[Phaser.Keyboard.NUMPAD_2]='2';
+				digits[Phaser.Keyboard.THREE]=digits[Phaser.Keyboard.NUMPAD_3]='3';
+				digits[Phaser.Keyboard.FOUR]=digits[Phaser.Keyboard.NUMPAD_4]='4';
+				digits[Phaser.Keyboard.FIVE]=digits[Phaser.Keyboard.NUMPAD_5]='5';
+				digits[Phaser.Keyboard.SIX]=digits[Phaser.Keyboard.NUMPAD_6]='6';
+				digits[Phaser.Keyboard.SEVEN]=digits[Phaser.Keyboard.NUMPAD_7]='7';
+				digits[Phaser.Keyboard.EIGHT]=digits[Phaser.Keyboard.NUMPAD_8]='8';
+				digits[Phaser.Keyboard.NINE]=digits[Phaser.Keyboard.NUMPAD_9]='9';
+				digits[Phaser.Keyboard.ZERO]=digits[Phaser.Keyboard.NUMPAD_0]='0';
+				if (digits[e.keyCode] !== undefined) {
+					buttonPressSound.play();
+					if (elevatorString === 'Invalid') elevatorString = '';
+					if (elevatorString.length < 4) { elevatorString += digits[e.keyCode]; elevatorText.setText(elevatorString); }
+				}
+				if (e.keyCode === Phaser.Keyboard.ENTER || e.keyCode === Phaser.Keyboard.NUMPAD_ENTER) {
+					buttonPressSound.play();
+					var shouldDestroy = false;
+					if(elevatorString == '1379') {playerSpawnX = 621; generateLevel('level3'); shouldDestroy = true;}
+					else if(elevatorString == '2821') {playerSpawnX = 621; generateLevel('level2'); shouldDestroy = true;}
+					else if(elevatorString == '3462') {playerSpawnX = 621; generateLevel('level1'); shouldDestroy = true;}
+					else if(elevatorString == '0117') {playerSpawnX = 214; generateLevel('morgueFloor'); shouldDestroy = true;}
+					else if(elevatorString == '0379') {playerSpawnX = 214; generateLevel('receptionFloor'); shouldDestroy = true;}
+					else { elevatorString = 'Invalid'; }
+					if (shouldDestroy) {
+						elevatorBackground.destroy(); button1.destroy(); button2.destroy(); button3.destroy();
+						button4.destroy(); button5.destroy(); button6.destroy(); button7.destroy();
+						button8.destroy(); button9.destroy(); button0.destroy(); buttonEnter.destroy(); elevatorText.destroy();
+						game.input.keyboard.onUpCallback = null; elevatorKeyboardSetup = false; elevatorOpen = false; canMove = true;
+					} else { elevatorText.setText(elevatorString); }
+				}
+			};
 		}
-			
-				
+		if (!elevatorOpen && elevatorKeyboardSetup) {
+			game.input.keyboard.onUpCallback = null;
+			elevatorKeyboardSetup = false;
+		}
+
 	},
 	hide: function(){
 		if(isClimbing == false && !climb && !hide && !pushOverlap && canMove == true){ //Don't allow player to hide when in front of the object
@@ -696,7 +697,6 @@ var playState = {
 					//Destroy the blown up version of the sprite on screen and allow player to move again
 					read.destroy();
 					canMove = true;
-					console.log('destroy');
 				}
 			}
 		}
@@ -706,9 +706,7 @@ var playState = {
 				doorEntering = doorGroup.children[i];
 				// only enter the door if the key exists in your inventory
 				if(game.physics.arcade.overlap(player, doorEntering) && inventory.indexOf(doorEntering.keyRequired) > -1 ){
-					console.log('now entering: ' + doorEntering.name);
 					if (doorEntering.name == 'elevator' && elevatorOpen == false && canMove == true) {
-						console.log('show elevator');
 						elevatorOpen = true;
 						canMove = false;
 						elevatorBackground = game.add.sprite(100, 20, 'elevatorAtlas', 'elevatorPanel');
@@ -756,8 +754,6 @@ var playState = {
 							}, this, 'buttonEnt', 'buttonEnt');
 
 					} else if (doorEntering.name == 'elevator' && elevatorOpen == true) {
-						console.log('kill elevator');
-						console.log(canMove);
 						elevatorBackground.destroy();
 						button1.destroy();
 						button2.destroy();
@@ -774,11 +770,9 @@ var playState = {
 						canMove = true;
 						elevatorOpen = false;
 					} else if (doorEntering.name == 'creepyDoor' && doorWasOpened == false ) {
-						console.log('open creepy');		
 						creepyDoor.animations.play('open door');
 						doorWasOpened = true;
 					}  else if (doorEntering.name == 'creepyDoor' && doorWasOpened == true ){
-						console.log('open  empty creepy');
 						creepyDoor.animations.play('empty open door');
 					} else {
 						if(canMove == true){
@@ -787,7 +781,6 @@ var playState = {
 							doorSound.play();
 							this.generateLevel(doorEntering.leadsTo);
 						
-							console.log(doorEntering.leadsTo);
 						}
 					}
 					break;
@@ -861,7 +854,6 @@ var playState = {
 			
 			inventoryOpen = true;
 		} else {
-			console.log('kill inv');
 			if( invFloor1 != undefined) {invFloor1.destroy();}
 			if( invFloor2 != undefined) {invFloor2.destroy();} 
 			if( invFloor3 != undefined) {invFloor3.destroy();} 
@@ -879,26 +871,32 @@ var playState = {
 	}
 };
 
+var destroyGroup = function(group, hasPopup) {
+	group.children.slice().forEach(function(c) {
+		if (hasPopup && c.popup) c.popup.destroy();
+		if (c.alive) c.kill();
+		c.destroy();
+	});
+	group.removeAll();
+};
+
 var generateLevel = function(levelName) {
 
-	console.log('generated');
-
-	// destroy can cause forEach to skip index. While loop helps ensure that all enemies get destroyed.
-	while(backgroundGroup.length > 0) { backgroundGroup.forEach(function (c) {c.kill(); c.destroy(); });}
-	while(doorGroup.length > 0) { doorGroup.forEach(function (c) {if(c.popup != undefined) {c.popup.destroy();} c.kill(); c.destroy(); });}
-	while(backLayer.length > 0) { backLayer.forEach(function (c) {c.kill(); c.destroy(); });}
-	while(obstacleHideGroup.length > 0) { obstacleHideGroup.forEach(function (c) {c.kill(); c.destroy(); });} 
-	while(obstacleGroup.length > 0) { obstacleGroup.forEach(function (c) {c.kill(); c.destroy(); });}
-	while(obstacleClimbGroup.length > 0) { obstacleClimbGroup.forEach(function (c) {c.kill(); c.destroy(); });}
-	while(obstaclePushGroup.length > 0) { obstaclePushGroup.forEach(function (c) {c.kill(); c.destroy(); });}
-	while(noteGroup.length > 0) { noteGroup.forEach(function (c) {if(c.popup != undefined) {c.popup.destroy();} c.kill(); c.destroy();});}
-	while(keyCardGroup.length > 0) { keyCardGroup.forEach(function (c) {c.kill(); c.destroy();});}
-	while(enemyGroup.length > 0) { enemyGroup.forEach(function (c) {c.kill(); c.destroy(); });}
-	while(obstacleEnemyPushGroup.length > 0) { obstacleEnemyPushGroup.forEach(function (c) {c.kill(); c.destroy(); });}
-	while(normalLayer.length > 0) {normalLayer.forEach(function (c) {c.kill(); c.destroy();});}
-	while(topLayer.length > 0) {topLayer.forEach(function (c) {c.kill(); c.destroy();});}
-	while(platforms.length > 0) {platforms.forEach(function (c) {c.kill(); c.destroy();});}
-	while(platforms2.length > 0) {platforms2.forEach(function (c) {c.kill(); c.destroy();});}
+	destroyGroup(backgroundGroup, false);
+	destroyGroup(doorGroup, true);
+	destroyGroup(backLayer, false);
+	destroyGroup(obstacleHideGroup, false);
+	destroyGroup(obstacleGroup, false);
+	destroyGroup(obstacleClimbGroup, false);
+	destroyGroup(obstaclePushGroup, false);
+	destroyGroup(noteGroup, true);
+	destroyGroup(keyCardGroup, false);
+	destroyGroup(enemyGroup, false);
+	destroyGroup(obstacleEnemyPushGroup, false);
+	destroyGroup(normalLayer, false);
+	destroyGroup(topLayer, false);
+	destroyGroup(platforms, false);
+	destroyGroup(platforms2, false);
 
 	//Current level data
 	levelData = game.cache.getJSON(levelName);
@@ -921,7 +919,6 @@ var generateLevel = function(levelName) {
 	for (var index = 0; index < levelData.doorData.length; index++) {
 		// set element to the object and use it's parameters
 		var doorTemp = new Door(game, levelData.doorData[index].frame, levelData.doorData[index].name, levelData.doorData[index].leadsTo, levelData.doorData[index].xPos, levelData.doorData[index].yPos, levelData.doorData[index].spawnAtx, levelData.doorData[index].keyRequired);
-		console.log(doorTemp.name);
 		game.physics.enable(doorTemp);
 		game.add.existing(doorTemp);
 		doorGroup.add(doorTemp);
@@ -940,7 +937,6 @@ var generateLevel = function(levelName) {
 		}
 		else if(obstacleTemp.pushable == "enemy") {
 			obstacleEnemyPushGroup.add(obstacleTemp);
-			console.log('this one is enemypush');
 		}
 		else if(obstacleTemp.pushable == true){
 			obstaclePushGroup.add(obstacleTemp);
@@ -948,14 +944,12 @@ var generateLevel = function(levelName) {
 		else{
 			obstacleGroup.add(obstacleTemp);
 		}
-		console.log(obstacleTemp.pushable);
 	} 
 
 	// generate notes
 	for (var index = 0; index < levelData.noteData.length; index++) {
 		// set element to the object and use it's parameters
 		var noteTemp = new Note(game, levelData.noteData[index].frame, levelData.noteData[index].name, levelData.noteData[index].leadsTo, levelData.noteData[index].xPos, levelData.noteData[index].yPos);
-		console.log(noteTemp.leadsTo);
 		noteTemp.alpha = 1;
 		noteTemp.scale.setTo(0.05, 0.05); 
 		if(noteTemp.leadsTo == 'family portrait'){
@@ -976,13 +970,11 @@ var generateLevel = function(levelName) {
 
 	//Player object
 	player = game.add.sprite(playerSpawnX, game.world.height - 165, 'atlas', 'patient-1.png');
-	//player properties
-	game.physics.enable([player], Phaser.Physics.ARCADE);
-	player.body.setSize(90, 270, 63, 4); // adjusts hitbox
+	game.physics.enable(player, Phaser.Physics.ARCADE);
 	player.anchor.set(0.5);
 	player.scale.x = 0.5;
 	player.scale.y = 0.5;
-	game.physics.enable(player);
+	player.body.setSize(90, 270, 63, 4);
 	player.body.gravity.y = playerGravity;
 	player.body.collideWorldBounds = true;
 	//animations for walking
@@ -1025,10 +1017,9 @@ var generateLevel = function(levelName) {
 	for (var index = 0; index < levelData.enemyData.length; index++) {
 		// set element to the object and use it's parameters
 		var enemyTemp = new Enemy(game, levelData.enemyData[index].key, levelData.enemyData[index].frame, levelData.enemyData[index].xPos, levelData.enemyData[index].yPos, levelData.enemyData[index].walkSpeed, levelData.enemyData[index].runSpeed, levelData.enemyData[index].walkDist, levelData.enemyData[index].turnTime, levelData.enemyData[index].facing, player);
-		if (levelData.enemyData[index].target == "none") { enemyTemp.target == "none";}
+		if (levelData.enemyData[index].target === "none") { enemyTemp.target = "none"; }
 		enemyTemp.scale.x = 0.17;
 		enemyTemp.scale.y = 0.145;
-		console.log(enemyTemp.target);
 		game.add.existing(enemyTemp);
 		enemyGroup.add(enemyTemp);
 
@@ -1078,8 +1069,8 @@ var generateLevel = function(levelName) {
 	platforms2.enableBody = true;
 	ground2 = platforms2.create(0, game.world.height - 150, 'grass'); //Note use a better placeholder art next time
 	ground2.scale.setTo(100, 0.5);
-	ground2.body.immovable = true; 
+	ground2.body.immovable = true;
 	ground2.alpha = 0;
 
-	console.log('done');
+	if (typeof touchGroup !== 'undefined' && touchGroup) game.world.bringToTop(touchGroup);
 };
