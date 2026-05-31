@@ -57,13 +57,38 @@ You should now have `Assets/Scripts/` in your project.
 
 The script is now attached. You should see its public fields (`Html File Name`, `Open On Start`, `Open On Play Button`) in the Inspector.
 
-### 5. Copy index.html Into the Project Root
+### 5. Copy the Entire Game Folder Into the Project Root
+
+The game is not a single file — it requires several subfolders alongside `index.html`. You must copy **all of the following** into the Unity project root (the folder that already contains `Assets`, `Library`, `Packages`, and `ProjectSettings`):
+
+| What to copy | Where it lives in this repo |
+|---|---|
+| `index.html` | repo root |
+| `framework/` | Phaser engine |
+| `js/` | game scripts |
+| `css/` | stylesheets |
+| `assets/` | images, audio |
+| `data/` | level JSON files |
 
 1. Open your file manager (Windows Explorer / macOS Finder).
-2. Navigate to your Unity project folder (the one containing the `Assets` folder).
-3. Copy your `index.html` file into this folder — at the **same level** as `Assets`, `Library`, `Packages`, and `ProjectSettings`. This is the project root.
+2. Navigate to the `Tetly_2d_horror_game` repository folder on your machine.
+3. Select all six items listed above and copy them.
+4. Paste them into the Unity project root — at the **same level** as `Assets`, `Library`, `Packages`, and `ProjectSettings`.
 
-> **Example path:** `C:\Users\YourName\Documents\EchoesOfWard13_Launcher\index.html`
+> **Example final structure:**
+> ```
+> EchoesOfWard13_Launcher/
+> ├── Assets/
+> ├── index.html          ← copied here
+> ├── framework/          ← copied here
+> ├── js/                 ← copied here
+> ├── css/                ← copied here
+> ├── assets/             ← copied here
+> ├── data/               ← copied here
+> ├── Library/
+> ├── Packages/
+> └── ProjectSettings/
+> ```
 
 ### 6. Test in the Unity Editor
 
@@ -252,7 +277,7 @@ Capacitor wraps your HTML5 game in a native Android app without any game engine.
    npx cap init "EchoesOfWard13" "com.ward13.echoes" --web-dir .
    ```
 
-6. Copy your `index.html` (and all game assets) into the `echoes-ward13` folder.
+6. Copy the entire game folder contents into `echoes-ward13` — that means `index.html`, `framework/`, `js/`, `css/`, `assets/`, and `data/` all sitting at the root of that folder.
 
 7. Add the Android platform:
    ```bash
