@@ -64,7 +64,8 @@ var touchKeys = { left: false, right: false, jumpPressed: false, interactPressed
 
 var playState = {
 	create: function() {
-		
+		document.getElementById('gameControls').style.display = 'flex';
+
 		//begin hospital music
 		music = game.add.audio('hospitalMusic');
 		music.loopFull(0.8);
@@ -473,6 +474,7 @@ var playState = {
    			//Send player to game over screen
    			else if(player.position.x >= 3500){;
    				fadeStart.destroy();
+				document.getElementById('gameControls').style.display = 'none';
 				game.state.start('end');
 			}
 		}
