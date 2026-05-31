@@ -3,7 +3,18 @@
 body {
 	font-family: Helvetica;
 	background: #000;
-	overflow-x: hidden;
+	overflow: hidden;
+}
+
+h1 {
+	text-align: center;
+	color: #1a1a1a;
+	font-size: 12px;
+	padding: 2px;
+}
+
+@media (max-width: 900px) {
+	h1 { display: none; }
 }
 
 canvas {
@@ -12,14 +23,61 @@ canvas {
 	height: auto !important;
 }
 
+/* ── Portrait rotation prompt ──────────────────────────── */
+#rotate-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: #000;
+	z-index: 9999;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	color: #777;
+	font-family: Helvetica, sans-serif;
+	text-align: center;
+	gap: 20px;
+}
+
+.rotate-icon {
+	font-size: 56px;
+	animation: tilt 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes tilt {
+	from { transform: rotate(-28deg); }
+	to   { transform: rotate( 28deg); }
+}
+
+.rotate-title {
+	font-size: 20px;
+	color: #aaa;
+	letter-spacing: 1px;
+}
+
+.rotate-sub {
+	font-size: 13px;
+	color: #555;
+}
+
+@media screen and (orientation: portrait) {
+	#rotate-overlay { display: flex; }
+	#gameControls   { display: none !important; }
+}
+
+/* ── Mobile game controls – fixed overlay ─────────────── */
 #gameControls {
 	display: none;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 0 14px 14px;
+	background: transparent;
+	z-index: 100;
 	justify-content: space-between;
 	align-items: flex-end;
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 12px 20px;
-	background: #0d0d0d;
+	pointer-events: none;
 	box-sizing: border-box;
 	user-select: none;
 	-webkit-user-select: none;
@@ -29,7 +87,8 @@ canvas {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 10px;
+	gap: 7px;
+	pointer-events: all;
 }
 
 #dpad {
@@ -50,50 +109,81 @@ canvas {
 	gap: 8px;
 }
 
+/* ── Base button – glass circle ────────────────────────── */
 .ctrl-btn {
-	background: rgba(40, 40, 60, 0.95);
-	color: #ccc;
-	border: 2px solid #444;
-	border-radius: 10px;
-	font-family: Helvetica, sans-serif;
-	font-weight: bold;
-	font-size: 18px;
+	background: rgba(6, 6, 18, 0.58);
+	color: rgba(210, 210, 232, 0.88);
+	border: 1.5px solid rgba(130, 118, 172, 0.30);
+	border-radius: 50%;
+	width: 58px;
+	height: 58px;
+	font-size: 20px;
 	cursor: pointer;
 	touch-action: manipulation;
 	-webkit-tap-highlight-color: transparent;
 	user-select: none;
 	-webkit-user-select: none;
-	line-height: 1.2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: Helvetica, sans-serif;
+	font-weight: bold;
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+	box-shadow: 0 2px 10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);
+	transition: background 0.07s, border-color 0.07s, transform 0.07s;
+	line-height: 1;
 	text-align: center;
+	padding: 0;
 }
 
 .ctrl-btn:active {
-	background: rgba(90, 90, 140, 0.95);
-	border-color: #99f;
+	background: rgba(78, 46, 136, 0.78);
+	border-color: rgba(168, 128, 255, 0.70);
 	color: #fff;
+	transform: scale(0.91);
 }
 
-#btn-up, #btn-down, #btn-left, #btn-right {
-	width: 58px;
-	height: 58px;
-	font-size: 22px;
+/* ── Sprint – pill ─────────────────────────────────────── */
+#btn-sprint {
+	border-radius: 20px;
+	width: auto;
+	min-width: 74px;
+	height: 36px;
+	font-size: 10px;
+	letter-spacing: 1.5px;
+	padding: 0 14px;
 }
 
+/* ── Jump – large, purple accent ───────────────────────── */
+#btn-jump {
+	width: 76px;
+	height: 76px;
+	font-size: 11px;
+	letter-spacing: 1.5px;
+	background: rgba(44, 16, 76, 0.68);
+	border-color: rgba(138, 82, 214, 0.46);
+	border-width: 2px;
+}
+
+#btn-jump:active {
+	background: rgba(102, 50, 188, 0.82);
+	border-color: rgba(192, 142, 255, 0.88);
+}
+
+/* ── HIDE / USE / INV – rounded rectangle ──────────────── */
 .action-btn {
-	padding: 10px 12px;
-	min-width: 72px;
-	font-size: 13px;
+	border-radius: 16px;
+	width: 60px;
+	height: 48px;
+	font-size: 10px;
+	letter-spacing: 0.8px;
+	line-height: 1.3;
 }
 
 .action-btn small {
 	display: block;
-	font-size: 11px;
-	color: #888;
-}
-
-.jump-btn {
-	padding: 16px 28px;
-	font-size: 16px;
-	background: rgba(60, 40, 80, 0.95);
-	border-color: #664;
+	font-size: 9px;
+	color: rgba(185, 185, 210, 0.48);
+	letter-spacing: 0;
 }

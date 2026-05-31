@@ -66,6 +66,15 @@ var playState = {
 	create: function() {
 		document.getElementById('gameControls').style.display = 'flex';
 
+		// Try to lock orientation to landscape (Android Chrome; silently fails on iOS)
+		if (screen.orientation && screen.orientation.lock) {
+			screen.orientation.lock('landscape').catch(function(){});
+		}
+		// Try fullscreen for browsers that require it before orientation lock
+		var el = document.documentElement;
+		if (el.requestFullscreen) { el.requestFullscreen().catch(function(){}); }
+		else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+
 		//begin hospital music
 		music = game.add.audio('hospitalMusic');
 		music.loopFull(0.8);
