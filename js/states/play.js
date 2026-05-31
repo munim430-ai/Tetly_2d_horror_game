@@ -675,8 +675,7 @@ var playState = {
 		var noteReading;
 		for(var i = 0; i < noteGroup.children.length; i++){
 			noteReading = noteGroup.children[i];
-			//if player is overlaping with the noteGroup
-			if(game.physics.arcade.overlap(player, noteReading)){
+			if(noteReading.poppingUp){
 				if(canMove == true){	
 					if(noteReading.name == 'random patient') {
 						read = game.add.sprite(noteReading.position.x - 240, noteReading.position.y - 150, 'speech bubble');
@@ -716,7 +715,10 @@ var playState = {
 			
 				doorEntering = doorGroup.children[i];
 				// only enter the door if the key exists in your inventory
-				if(game.physics.arcade.overlap(player, doorEntering) && inventory.indexOf(doorEntering.keyRequired) > -1 ){
+				// use poppingUp (same proximity flag as the E prompt) instead of overlap,
+				// because overlap requires the player to be physically inside the door body
+				// while the E prompt appears at 50px range — causing E to appear to do nothing
+				if(doorEntering.poppingUp && inventory.indexOf(doorEntering.keyRequired) > -1 ){
 					if (doorEntering.name == 'elevator' && elevatorOpen == false && canMove == true) {
 						elevatorOpen = true;
 						canMove = false;
@@ -796,7 +798,7 @@ var playState = {
 					}
 					break;
 				} else {
-					if(game.physics.arcade.overlap(player, doorEntering) && inventory.indexOf(doorEntering.keyRequired) <= -1 && canMove == true){
+					if(doorEntering.poppingUp && inventory.indexOf(doorEntering.keyRequired) <= -1 && canMove == true){
 						doorLockedSound.play();
 					}
 				}
