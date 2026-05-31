@@ -220,8 +220,10 @@ var load = {
 
 	},
 	create: function(){
-		console.log('Load: create');
-		game.physics.startSystem(Phaser.Physics.ARCADE); //can change physics system if needed
-		game.state.start('menu'); //move to next state after preload is finished
+		game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		game.scale.pageAlignHorizontally = true;
+		game.scale.pageAlignVertically = true;
+		game.physics.startSystem(Phaser.Physics.ARCADE);
+		game.state.start('menu');
 	}
 };
